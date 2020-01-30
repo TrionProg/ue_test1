@@ -2,6 +2,8 @@
 
 #include "Spectator.h"
 
+#include "Runtime/Engine/Classes/Components/InputComponent.h"
+
 
 // Sets default values
 ASpectator::ASpectator()
@@ -9,7 +11,6 @@ ASpectator::ASpectator()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	//Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh"); //TODO Pivot..etc
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	spring_arm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
 	camera = CreateDefaultSubobject<UCameraComponent>("Camera");
