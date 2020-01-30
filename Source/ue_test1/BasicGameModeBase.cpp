@@ -47,7 +47,9 @@ void ABasicGameModeBase::InitGame(const FString& MapName, const FString& Options
 void ABasicGameModeBase::Tick(float DeltaSeconds) {
 	//UE_LOG(LogTemp, Warning, TEXT("Tick"));
 
-	TArray<AActor*> found_actors;
+	/*
+
+	TArray<AActor*> found_actors; 
 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), found_actors);
 
@@ -66,4 +68,5 @@ void ABasicGameModeBase::Tick(float DeltaSeconds) {
 			//UE_LOG(LogTemp, Warning, msg);
 		}
 	}
+	*/
 }

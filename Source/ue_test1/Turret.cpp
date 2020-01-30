@@ -7,6 +7,7 @@
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "Runtime/Engine/Classes/Engine/World.h"
 
 
 // Sets default values
@@ -43,6 +44,7 @@ ATurret::ATurret()
 	gun_lamp->SetRelativeScale3D(FVector(0.6, 0.4, 0.2));
 
 	target = nullptr;
+	shot_interval_progress = shot_interval;
 }
 
 // Called when the game starts or when spawned
@@ -51,12 +53,21 @@ void ATurret::BeginPlay()
 	Super::BeginPlay();
 	
 	target = nullptr;
+	shot_interval_progress = shot_interval;
 }
 
 // Called every frame
-void ATurret::Tick(float DeltaTime)
+void ATurret::Tick(float dt)
 {
-	Super::Tick(DeltaTime);
+	Super::Tick(dt);
+
+	if (shot_interval_progress != shot_interval) {
+		shot_interval_progress += dt;
+
+		if (shot_interval_progress > shot_interval) {
+			shot_interval_progress = shot_interval;
+		}
+	}
 
 	if (target == nullptr) {
 		find_target();
@@ -67,6 +78,11 @@ void ATurret::Tick(float DeltaTime)
 
 		auto rotator = look_at(location, FVector(0, 0, 1));
 		gun_body->SetWorldRotation(rotator);
+
+		if (shot_interval_progress == shot_interval) {
+			//Shoot
+			shoot();
+		}
 	}
 }
 
@@ -177,6 +193,39 @@ void ATurret::find_target() {
 	}
 
 	target = target_enemy;
+}
+
+void ATurret::shoot() {
+	if (ShootProjectile != NULL)
+	{
+		UWorld* const world = GetWorld();
+		if (world != NULL)
+		{
+			const auto spawn_rotation = gun_body->GetComponentRotation();
+			const auto spawn_location = gun_body->GetComponentLocation();
+			//TODO
+			//const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
+			// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
+			//const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
+
+			//Set Spawn Collision Handling Override
+			FActorSpawnParameters ActorSpawnParams;
+			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+
+			// spawn the projectile at the muzzle
+			world->SpawnActor<AProjectile>(ShootProjectile, spawn_location, spawn_rotation, ActorSpawnParams);
+
+			shot_interval_progress = 0;
+			UE_LOG(LogTemp, Warning, TEXT("Shoot"));
+		}
+	}
+
+	/*
+	if (FireSound != NULL)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+	}
+	*/
 }
 
 void ATurret::on_enemy_died(AEnemy* enemy) {

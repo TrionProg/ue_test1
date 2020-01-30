@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Enemy.h"
+#include "Projectile.h"
 
 #include "Turret.generated.h"
 
@@ -21,8 +22,16 @@ public:
 	UStaticMeshComponent* gun_barrel;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* gun_lamp;
+
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	TSubclassOf<class AProjectile> ShootProjectile;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) //EditAnywhere, Category = Projectile
+	float shot_interval;
+
 private:
 	AEnemy* target;
+	float shot_interval_progress;
 public:
 	// Sets default values for this pawn's properties
 	ATurret();
@@ -33,6 +42,8 @@ protected:
 private:
 	// ָשול בכטחזאירודמ גנאדא
 	void find_target();
+
+	void shoot();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
