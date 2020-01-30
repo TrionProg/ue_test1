@@ -4,6 +4,7 @@
 #include "Spectator.h"
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "Runtime/Engine/Classes/Components/ActorComponent.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 
 ABasicGameModeBase::ABasicGameModeBase(): Super() {
@@ -30,114 +31,39 @@ ABasicGameModeBase::ABasicGameModeBase(): Super() {
 
 
 void ABasicGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) {
+	Super::InitGame(MapName, Options, ErrorMessage);
 
 	UE_LOG(LogTemp, Warning, TEXT("InitGame"));
 
-	/*
+	for (float i = -400; i < 600; i+=130) {
+		auto pos = FVector(800, i, 0);
 
-	static ConstructorHelpers::FObjectFinder<AActor> Enemy(TEXT("Blueprint'/Game/Blueprints/WeakEnemy.WeakEnemy'"));
-
-	auto pos = FVector(800, -240, 0);
-
-	AActor* my_actor = (AActor*)GetWorld()->SpawnActor((UClass*)Enemy.Object, &pos);
-	*/
-
-	//--------------
-
-	static ConstructorHelpers::FClassFinder<AActor> WeakEnemyClassFinder(TEXT("Blueprint'/Game/Blueprints/WeakEnemy'"));
-	if (WeakEnemyClassFinder.Succeeded())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AAA"));
-		//AActor* NewActor = GetWorld()->SpawnActor<AActor>(GetClass(), &position, &rotator);
-		//auto WeakEnemy = Cast<TSubclassOf<AEnemy>>(WeakEnemyClassFinder.Class);
-		//WeakEnemy = (AEnemy*)WeakEnemyClassFinder.Object;
-
-		auto pos = FVector(800, -240, 0);
-
-		AActor* my_actor = (AActor*)GetWorld()->SpawnActor(WeakEnemyClassFinder.Class, &pos);
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("CCC"));
-		return;
+		AActor* my_actor = (AActor*)GetWorld()->SpawnActor(WeakEnemy, &pos);
 	}
 
-
-	/*
-	static ConstructorHelpers::FObjectFinder<UClass> WeakEnemyClassFinder(TEXT("Blueprint'/Game/Blueprints/WeakEnemy.WeakEnemy'"));
-	if (!WeakEnemyClassFinder.Succeeded()) {
-		UE_LOG(LogTemp, Warning, TEXT("AAA"));
-		return;
-	}
-	*/
-
-	/*
-	UE_LOG(LogTemp, Warning, TEXT("BBB"));
-
-	auto pos = FVector(800, -240, 0);
-
-	AActor* my_actor = (AActor*)GetWorld()->SpawnActor(WeakEnemy, &pos);
-	*/
-
-	/*
-	WeakEnemy = WeakEnemyClassFinder.Object;
-
-	//AFloorCell* NewFloorCell = SpawnActor<AFloorCell>(FloorCellClass, SpawnParams);
-
-	auto pos = FVector(800, -240, 0);
-
-	AActor* my_actor = (AActor*)GetWorld()->SpawnActor(WeakEnemy, &pos);
-	*/
-
-
-	/*
-	static ConstructorHelpers::FObjectFinder<UBlueprint> onlineSpawnBP(TEXT("Blueprint'/Game/Blueprints/WeakEnemy.WeakEnemy'"));
-	if (onlineSpawnBP)
-	{
-		AActor* NewActor = GetWorld()->SpawnActor<AActor>(GetClass(), &position, &rotator);
-	}
-
-
-	static ConstructorHelpers::FClassFinder<AActor> Enemy(TEXT("Blueprint'/Game/Blueprints/WeakEnemy.WeakEnemy'"));
-
-	if (!Enemy.Succeeded()) {
-		UE_LOG(LogTemp, Warning, TEXT("AAA"));
-		return;
-	}
-	*/
-
-	/*
-	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Blueprints/WeakEnemy.WeakEnemy'")));
-
-	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
-	if (!SpawnActor)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AAA"));
-		return;
-	}
-
-	UClass* SpawnClass = SpawnActor->StaticClass();
-	if (SpawnClass == NULL)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("BBB"));
-		return;
-	}
-
-	auto pos = FVector(800, -240, 0);
-
-	AActor* my_actor = (AActor*)GetWorld()->SpawnActor(SpawnClass, &pos);
-	*/
-
-	/*
-	UWorld* World = GetWorld();
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	World->SpawnActor<AActor>(GeneratedBP->GeneratedClass, GetActorLocation(), GetActorRotation(), SpawnParams);
-	*/
-
-	Super::InitGame(MapName, Options, ErrorMessage);
+	//Super::InitGame(MapName, Options, ErrorMessage);
 }
 
 void ABasicGameModeBase::Tick(float DeltaSeconds) {
 	//UE_LOG(LogTemp, Warning, TEXT("Tick"));
+
+	TArray<AActor*> found_actors;
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), found_actors);
+
+	for (AActor* abstract_actor : found_actors)
+	{
+		AEnemy* enemy = Cast<AEnemy>(abstract_actor);
+
+		if (enemy != nullptr) {
+			//UE_LOG(LogTemp, Warning, TEXT("Enemy!"));
+			auto location = enemy->GetActorLocation();
+
+			UE_LOG(LogClass, Warning, TEXT("Enemy! %f %f %f"), location.X, location.Y, location.Z);
+
+			//auto msg = FString::Printf(TEXT("Enemy! %f %f %f"), location.X, location.Y, location.Z);
+
+			//UE_LOG(LogTemp, Warning, msg);
+		}
+	}
 }
