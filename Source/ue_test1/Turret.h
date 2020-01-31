@@ -9,6 +9,8 @@
 
 #include "Turret.generated.h"
 
+const float TURRET_BARREL_NORMAL_POSITION = 50;
+
 UCLASS()
 class UE_TEST1_API ATurret : public APawn
 {
@@ -29,6 +31,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) //EditAnywhere, Category = Projectile
 	float shot_interval;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) //EditAnywhere
+	uint8 type;
+
 private:
 	AEnemy* target;
 	float shot_interval_progress;
@@ -45,6 +50,8 @@ private:
 	void find_target();
 
 	void shoot();
+
+	void animate_shoot();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -56,5 +63,7 @@ public:
 	FRotator look_at(FVector lookAt, FVector upDirection);
 
 	void on_enemy_died(AEnemy* enemy);
+
+	uint8 get_type();
 	
 };

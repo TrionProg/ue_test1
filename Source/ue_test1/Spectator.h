@@ -18,9 +18,10 @@ class UE_TEST1_API ASpectator : public APawn
 {
 	GENERATED_BODY()
 
+private:
+	
+
 public:
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	//UStaticMeshComponent* Mesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USpringArmComponent* spring_arm;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -28,6 +29,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float movement_force;
+
+private:
+	float money;
 
 public:
 	// Sets default values for this pawn's properties
@@ -47,6 +51,7 @@ public:
 	void move_up(float value);
 	void move_right(float value);
 
-	bool build(uint32 turret_type);
+	bool build(uint8 turret_type);
 	
+	int32 get_money();
 };

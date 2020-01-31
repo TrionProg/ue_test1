@@ -3,9 +3,11 @@
 #include "Spectator.h"
 
 #include "Runtime/Engine/Classes/Components/InputComponent.h"
+#include "Runtime/Engine/Classes/Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "BuildSpot.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "BasicGameModeBase.h"
 
 
 // Sets default values
@@ -46,6 +48,9 @@ ASpectator::ASpectator()
 void ASpectator::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ABasicGameModeBase * game_mode = Cast<ABasicGameModeBase>(GetWorld()->GetAuthGameMode());
+	money = (float)game_mode->get_start_money();
 	
 }
 
@@ -94,7 +99,7 @@ void ASpectator::move_up(float value) {
 	root->AddLocalOffset(force_to_add);
 }
 
-bool ASpectator::build(uint32 turret_type) {
+bool ASpectator::build(uint8 turret_type) {
 	if (APlayerController* PC = Cast<APlayerController>(GetController())) {
 		FHitResult TraceHitResult;
 		PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
@@ -119,4 +124,8 @@ bool ASpectator::build(uint32 turret_type) {
 	}
 
 	return false;
+}
+
+int32 ASpectator::get_money() {
+	return (int32)money;
 }

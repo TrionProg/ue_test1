@@ -38,7 +38,7 @@ ATurret::ATurret()
 	gun_body->bAbsoluteRotation = true;
 	gun_body->SetWorldLocation(FVector(0.0, 0.0, 150.0));
 	gun_body->SetWorldScale3D(FVector(1, 0.2, 0.2));
-	gun_barrel->SetRelativeLocation(FVector(50, 0.0, 30.0));
+	gun_barrel->SetRelativeLocation(FVector(TURRET_BARREL_NORMAL_POSITION, 0.0, 30.0));
 	gun_barrel->SetRelativeScale3D(FVector(0.6, 0.4, 0.4));
 	gun_lamp->SetRelativeLocation(FVector(-15, 0.0, 100.0));
 	gun_lamp->SetRelativeScale3D(FVector(0.6, 0.4, 0.2));
@@ -67,6 +67,8 @@ void ATurret::Tick(float dt)
 		if (shot_interval_progress > shot_interval) {
 			shot_interval_progress = shot_interval;
 		}
+
+		animate_shoot();
 	}
 
 	if (target == nullptr) {
@@ -226,9 +228,28 @@ void ATurret::shoot() {
 	*/
 }
 
+void ATurret::animate_shoot() {
+	float pos = TURRET_BARREL_NORMAL_POSITION;
+	float payback_interval = shot_interval * 0.2;
+
+	if (shot_interval_progress < payback_interval) {// מעהאקא
+		auto k = ((payback_interval - shot_interval_progress) / payback_interval);
+		pos = TURRET_BARREL_NORMAL_POSITION * k;
+	}else if (shot_interval_progress < shot_interval) {
+		auto k = ((shot_interval_progress - payback_interval) / (shot_interval * 0.8));
+		pos = TURRET_BARREL_NORMAL_POSITION * k;
+	}
+
+	gun_barrel->SetRelativeLocation(FVector(pos, 0.0, 30.0));
+}
+
 void ATurret::on_enemy_died(AEnemy* enemy) {
 	if (target == enemy) {
 		target = nullptr;
 		find_target();
 	}
+}
+
+uint8 ATurret::get_type() {
+	return type;
 }

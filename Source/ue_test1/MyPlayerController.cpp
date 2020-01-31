@@ -10,9 +10,10 @@ AMyPlayerController::AMyPlayerController() {
 
 }
 
-void AMyPlayerController::PlayerTick(float dt) {
-	Super::PlayerTick(dt);
-
+void AMyPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+	SetInputMode(FInputModeGameAndUI());
 }
 
 void AMyPlayerController::SetupInputComponent() {
@@ -24,6 +25,10 @@ void AMyPlayerController::SetupInputComponent() {
 
 	InputComponent->BindAction("LMBClick", IE_Pressed, this, &AMyPlayerController::on_lmb_press);
 	InputComponent->BindAction("LMBClick", IE_Released, this, &AMyPlayerController::on_lmb_release);
+}
+
+void AMyPlayerController::PlayerTick(float dt) {
+	Super::PlayerTick(dt);
 }
 
 void AMyPlayerController::move_right(float value) {

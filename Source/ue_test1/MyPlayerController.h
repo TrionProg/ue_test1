@@ -18,8 +18,9 @@ public:
 	AMyPlayerController();
 
 protected:
-	virtual void PlayerTick(float DeltaTime) override;
+	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
+	virtual void PlayerTick(float DeltaTime) override;
 	
 	void move_up(float value);
 	void move_right(float value);

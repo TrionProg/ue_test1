@@ -44,6 +44,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	bool build(uint32 turret_type);
+	bool build(uint8 turret_type);
 	
 };

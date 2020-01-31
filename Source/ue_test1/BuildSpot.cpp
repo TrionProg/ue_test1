@@ -41,12 +41,16 @@ void ABuildSpot::Tick(float DeltaTime)
 
 }
 
-bool ABuildSpot::build(uint32 turret_type) {
+bool ABuildSpot::build(uint8 turret_type) {
 	if (turret != nullptr) {
-		return false;
+		//Строим лишь то, что круче
+		if (turret_type > turret->get_type()) {
+			turret->Destroy();
+			turret = nullptr;
+		}else {
+			return false;
+		}
 	}
-
-	//TODO build if new turret is better
 
 	auto pos = GetActorLocation();
 

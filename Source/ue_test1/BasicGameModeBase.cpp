@@ -70,3 +70,32 @@ void ABasicGameModeBase::Tick(float DeltaSeconds) {
 	}
 	*/
 }
+
+int32 ABasicGameModeBase::get_start_money() {
+	return start_money;
+}
+
+void ABasicGameModeBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	//TODO IsLocalController(). and move to controller
+	ChangeMenuWidget(StartingWidgetClass);
+}
+
+void ABasicGameModeBase::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)
+{
+	if (CurrentWidget != nullptr)
+	{
+		CurrentWidget->RemoveFromViewport();
+		CurrentWidget = nullptr;
+	}
+	if (NewWidgetClass != nullptr)
+	{
+		CurrentWidget = CreateWidget<UUserWidget>(GetWorld(), NewWidgetClass);
+		if (CurrentWidget != nullptr)
+		{
+			CurrentWidget->AddToViewport();
+		}
+	}
+}
