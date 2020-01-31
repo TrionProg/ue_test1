@@ -46,4 +46,9 @@ void AMyPlayerController::on_lmb_press() {
 
 void AMyPlayerController::on_lmb_release() {
 	UE_LOG(LogTemp, Warning, TEXT("Click"));
+
+	auto pawn = GetPawn();
+	auto spectator = (ASpectator*)pawn;
+
+	spectator->build(1);
 }

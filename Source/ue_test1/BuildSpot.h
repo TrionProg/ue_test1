@@ -4,12 +4,33 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Turret.h"
+
 #include "BuildSpot.generated.h"
+
+//TODO may be namespace?
+const float BUILDSPOT_CLICK_RADUS = 100.0;
 
 UCLASS()
 class UE_TEST1_API ABuildSpot : public AActor
 {
 	GENERATED_BODY()
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class UDecalComponent* decal;
+
+	//TODO is it static?
+	UPROPERTY(EditDefaultsOnly, Category = Enemy)
+	TSubclassOf<class ATurret> Turret1;
+
+	UPROPERTY(EditDefaultsOnly, Category = Enemy)
+	TSubclassOf<class ATurret> Turret2;
+
+	UPROPERTY(EditDefaultsOnly, Category = Enemy)
+	TSubclassOf<class ATurret> Turret3;
+
+	ATurret *turret;
+public:
 	
 public:	
 	// Sets default values for this actor's properties
@@ -23,6 +44,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	
+	bool build(uint32 turret_type);
 	
 };

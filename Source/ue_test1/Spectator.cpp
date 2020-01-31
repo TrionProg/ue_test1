@@ -3,10 +3,9 @@
 #include "Spectator.h"
 
 #include "Runtime/Engine/Classes/Components/InputComponent.h"
-#include "UObject/ConstructorHelpers.h"
-#include "Components/DecalComponent.h"
-#include "Materials/Material.h"
 #include "GameFramework/PlayerController.h"
+#include "BuildSpot.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 
 // Sets default values
@@ -34,17 +33,6 @@ ASpectator::ASpectator()
 
 	movement_force = 8.0;
 
-	// Create a decal in the world to show the cursor's location
-	CursorToWorld = CreateDefaultSubobject<UDecalComponent>("CursorToWorld");
-	CursorToWorld->SetupAttachment(RootComponent);
-	static ConstructorHelpers::FObjectFinder<UMaterial> DecalMaterialAsset(TEXT("Material'/Game/Materials/M_Cursor_Decal.M_Cursor_Decal'"));
-	if (DecalMaterialAsset.Succeeded())
-	{
-		CursorToWorld->SetDecalMaterial(DecalMaterialAsset.Object);
-	}
-	CursorToWorld->DecalSize = FVector(16.0f, 32.0f, 32.0f);
-	CursorToWorld->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion());
-
 	//Take control of the default Player
 	//AutoPossessPlayer = EAutoReceiveInput::Player0; //TODO ??
 
@@ -66,6 +54,7 @@ void ASpectator::Tick(float dt)
 {
 	Super::Tick(dt);
 
+	/*
 	if (CursorToWorld != nullptr)
 	{
 		if (APlayerController* PC = Cast<APlayerController>(GetController()))
@@ -78,6 +67,7 @@ void ASpectator::Tick(float dt)
 			CursorToWorld->SetWorldRotation(CursorR);
 		}
 	}
+	*/
 
 }
 
@@ -102,4 +92,31 @@ void ASpectator::move_up(float value) {
 	FVector force_to_add = movement_force * value * FVector(1, 0, 0);
 	auto root = (USceneComponent*)RootComponent;
 	root->AddLocalOffset(force_to_add);
+}
+
+bool ASpectator::build(uint32 turret_type) {
+	if (APlayerController* PC = Cast<APlayerController>(GetController())) {
+		FHitResult TraceHitResult;
+		PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
+		FVector cursor_position = TraceHitResult.Location;
+
+		TArray<AActor*> found_actors;
+
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABuildSpot::StaticClass(), found_actors);
+
+		for (AActor* abstract_actor : found_actors) {
+			ABuildSpot* build_spot = Cast<ABuildSpot>(abstract_actor);
+
+			if (build_spot != nullptr) {
+				auto location = build_spot->GetActorLocation();
+				auto dist = FVector::Dist2D(cursor_position, location);
+
+				if (dist <BUILDSPOT_CLICK_RADUS) {
+					return build_spot->build(turret_type);
+				}
+			}
+		}
+	}
+
+	return false;
 }

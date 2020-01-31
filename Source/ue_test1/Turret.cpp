@@ -174,8 +174,7 @@ void ATurret::find_target() {
 	AEnemy* target_enemy = nullptr;
 	float min_dist = MAX_FLT;
 
-	for (AActor* abstract_actor : found_actors)
-	{
+	for (AActor* abstract_actor : found_actors) {
 		AEnemy* enemy = Cast<AEnemy>(abstract_actor);
 
 		if (enemy != nullptr) {

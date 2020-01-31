@@ -29,10 +29,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float movement_force;
 
-	/** A decal that projects to the cursor location. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UDecalComponent* CursorToWorld;
-
 public:
 	// Sets default values for this pawn's properties
 	ASpectator();
@@ -50,5 +46,7 @@ public:
 
 	void move_up(float value);
 	void move_right(float value);
+
+	bool build(uint32 turret_type);
 	
 };

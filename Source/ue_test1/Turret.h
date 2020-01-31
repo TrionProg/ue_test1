@@ -32,6 +32,7 @@ public:
 private:
 	AEnemy* target;
 	float shot_interval_progress;
+	//float 
 public:
 	// Sets default values for this pawn's properties
 	ATurret();
