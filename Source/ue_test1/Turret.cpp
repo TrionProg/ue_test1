@@ -216,7 +216,6 @@ void ATurret::shoot() {
 			world->SpawnActor<AProjectile>(ShootProjectile, spawn_location, spawn_rotation, ActorSpawnParams);
 
 			shot_interval_progress = 0;
-			UE_LOG(LogTemp, Warning, TEXT("Shoot"));
 		}
 	}
 

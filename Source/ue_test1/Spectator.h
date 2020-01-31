@@ -29,6 +29,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float movement_force;
 
+	/** A decal that projects to the cursor location. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class UDecalComponent* CursorToWorld;
+
 public:
 	// Sets default values for this pawn's properties
 	ASpectator();

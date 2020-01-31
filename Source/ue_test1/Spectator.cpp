@@ -3,6 +3,10 @@
 #include "Spectator.h"
 
 #include "Runtime/Engine/Classes/Components/InputComponent.h"
+#include "UObject/ConstructorHelpers.h"
+#include "Components/DecalComponent.h"
+#include "Materials/Material.h"
+#include "GameFramework/PlayerController.h"
 
 
 // Sets default values
@@ -30,6 +34,17 @@ ASpectator::ASpectator()
 
 	movement_force = 8.0;
 
+	// Create a decal in the world to show the cursor's location
+	CursorToWorld = CreateDefaultSubobject<UDecalComponent>("CursorToWorld");
+	CursorToWorld->SetupAttachment(RootComponent);
+	static ConstructorHelpers::FObjectFinder<UMaterial> DecalMaterialAsset(TEXT("Material'/Game/Materials/M_Cursor_Decal.M_Cursor_Decal'"));
+	if (DecalMaterialAsset.Succeeded())
+	{
+		CursorToWorld->SetDecalMaterial(DecalMaterialAsset.Object);
+	}
+	CursorToWorld->DecalSize = FVector(16.0f, 32.0f, 32.0f);
+	CursorToWorld->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion());
+
 	//Take control of the default Player
 	//AutoPossessPlayer = EAutoReceiveInput::Player0; //TODO ??
 
@@ -47,9 +62,22 @@ void ASpectator::BeginPlay()
 }
 
 // Called every frame
-void ASpectator::Tick(float DeltaTime)
+void ASpectator::Tick(float dt)
 {
-	Super::Tick(DeltaTime);
+	Super::Tick(dt);
+
+	if (CursorToWorld != nullptr)
+	{
+		if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		{
+			FHitResult TraceHitResult;
+			PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
+			FVector CursorFV = TraceHitResult.ImpactNormal;
+			FRotator CursorR = CursorFV.Rotation();
+			CursorToWorld->SetWorldLocation(TraceHitResult.Location);
+			CursorToWorld->SetWorldRotation(CursorR);
+		}
+	}
 
 }
 
@@ -60,8 +88,8 @@ void ASpectator::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 	InputComponent = PlayerInputComponent;
 
-	InputComponent->BindAxis("move up", this, &ASpectator::move_up);
-	InputComponent->BindAxis("move right", this, &ASpectator::move_right);
+	//InputComponent->BindAxis("move up", this, &ASpectator::move_up);
+	//InputComponent->BindAxis("move right", this, &ASpectator::move_right);
 }
 
 void ASpectator::move_right(float value) {
