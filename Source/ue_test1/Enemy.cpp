@@ -13,12 +13,11 @@
 AEnemy::AEnemy()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	//PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = true;
 
-	//RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 
 	sphere1 = CreateDefaultSubobject<UStaticMeshComponent>("Sphere 1");
-	RootComponent = sphere1;
 	sphere2 = CreateDefaultSubobject<UStaticMeshComponent>("Sphere 2");
 	sphere3 = CreateDefaultSubobject<UStaticMeshComponent>("Sphere 3");
 
@@ -53,7 +52,7 @@ AEnemy::AEnemy()
 	//sphere3 = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 
 	
-	//sphere1->SetupAttachment(RootComponent);
+	sphere1->SetupAttachment(RootComponent);
 	sphere2->SetupAttachment(RootComponent);
 	sphere3->SetupAttachment(RootComponent);
 
@@ -64,11 +63,11 @@ AEnemy::AEnemy()
 	sphere3->SetStaticMesh(MeshToUse.Object);
 
 	
-	//sphere1->SetWorldLocation(FVector(0.0, 0.0, 0.0));
-	sphere2->SetRelativeLocation(FVector(0.0, 0.0, 90.0));
+	sphere1->SetWorldLocation(FVector(0.0, 0.0, 0.0));
+	sphere2->SetWorldLocation(FVector(0.0, 0.0, 90.0));
 	sphere2->SetWorldScale3D(FVector(0.75));
-	sphere3->SetWorldLocation(FVector(0.0, 0.0, 160.0));
-	sphere3->SetWorldScale3D(FVector(0.45));
+	sphere3->SetRelativeLocation(FVector(0.0, 0.0, 160.0));
+	sphere3->SetRelativeScale3D(FVector(0.45));
 
 	max_health = 100;
 	max_speed = 1;

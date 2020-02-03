@@ -18,5 +18,8 @@ class UE_TEST1_API UMyHUD : public UUserWidget
 public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetMoney(int32 money);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetCurrentTurret(const FString& type, int32 price);
 	
 };

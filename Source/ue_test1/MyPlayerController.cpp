@@ -17,6 +17,7 @@ void AMyPlayerController::BeginPlay()
 
 	//TODO IsLocalController(). and move to controller
 	ChangeMenuWidget(StartingWidgetClass);
+	select_turret_type(1);
 }
 
 void AMyPlayerController::SetupInputComponent() {
@@ -28,6 +29,10 @@ void AMyPlayerController::SetupInputComponent() {
 
 	InputComponent->BindAction("LMBClick", IE_Pressed, this, &AMyPlayerController::on_lmb_press);
 	InputComponent->BindAction("LMBClick", IE_Released, this, &AMyPlayerController::on_lmb_release);
+
+	InputComponent->BindAction("Turret1", IE_Released, this, &AMyPlayerController::on_key1_release);
+	InputComponent->BindAction("Turret2", IE_Released, this, &AMyPlayerController::on_key2_release);
+	InputComponent->BindAction("Turret3", IE_Released, this, &AMyPlayerController::on_key3_release);
 }
 
 void AMyPlayerController::PlayerTick(float dt) {
@@ -94,4 +99,32 @@ void AMyPlayerController::draw_money() {
 	auto hud = (UMyHUD*)CurrentWidget;
 
 	hud->SetMoney(money);
+}
+
+void AMyPlayerController::on_key1_release() {
+	select_turret_type(1);
+}
+
+void AMyPlayerController::on_key2_release() {
+	select_turret_type(2);
+}
+
+void AMyPlayerController::on_key3_release() {
+	select_turret_type(3);
+}
+
+void AMyPlayerController::select_turret_type(uint8 turret_type) {
+	auto spectator = get_spectator();
+	auto turret_name = spectator->get_turret_name(turret_type);
+	auto turret_price = spectator->get_turret_price(turret_type);
+
+	get_spectator()->set_current_turret_type(turret_type);
+
+	if (!IsLocalController()) {
+		return;
+	}
+
+	auto hud = (UMyHUD*)CurrentWidget;
+
+	hud->SetCurrentTurret(turret_name, turret_price);
 }

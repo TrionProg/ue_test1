@@ -10,6 +10,7 @@
 #include "Turret.generated.h"
 
 const float TURRET_BARREL_NORMAL_POSITION = 50;
+const float TURRET_MUZZLE_POSITION = 70;
 
 UCLASS()
 class UE_TEST1_API ATurret : public APawn
@@ -24,6 +25,8 @@ public:
 	UStaticMeshComponent* gun_barrel;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* gun_lamp;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	USceneComponent* gun_muzzle;
 
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	TSubclassOf<class AProjectile> ShootProjectile;

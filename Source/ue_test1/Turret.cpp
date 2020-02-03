@@ -22,10 +22,12 @@ ATurret::ATurret()
 	gun_body = CreateDefaultSubobject<UStaticMeshComponent>("GunBody");
 	gun_barrel = CreateDefaultSubobject<UStaticMeshComponent>("GunBarrel");
 	gun_lamp = CreateDefaultSubobject<UStaticMeshComponent>("GunLamp");
+	gun_muzzle = CreateDefaultSubobject<USceneComponent>(TEXT("Muzzle"));
 
 	gun_body->SetupAttachment(RootComponent);
 	gun_barrel->SetupAttachment(gun_body);
 	gun_lamp->SetupAttachment(gun_body);
+	gun_muzzle->SetupAttachment(gun_body);
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> Base(TEXT("StaticMesh'/Game/StarterContent/Shapes/Shape_Cone.Shape_Cone'"));
 	base->SetStaticMesh(Base.Object);
@@ -42,6 +44,7 @@ ATurret::ATurret()
 	gun_barrel->SetRelativeScale3D(FVector(0.6, 0.4, 0.4));
 	gun_lamp->SetRelativeLocation(FVector(-15, 0.0, 100.0));
 	gun_lamp->SetRelativeScale3D(FVector(0.6, 0.4, 0.2));
+	gun_muzzle->SetRelativeLocation(FVector(TURRET_MUZZLE_POSITION, 0.0, 30.0));
 
 	target = nullptr;
 	shot_interval_progress = shot_interval;
@@ -202,10 +205,11 @@ void ATurret::shoot() {
 		UWorld* const world = GetWorld();
 		if (world != NULL)
 		{
-			const auto spawn_rotation = gun_body->GetComponentRotation();
-			 auto spawn_location = gun_body->GetComponentLocation();
+			const auto spawn_rotation = gun_muzzle->GetComponentRotation();
+			const auto spawn_location = gun_muzzle->GetComponentLocation();
 
-			spawn_location.Z = 60;
+			UE_LOG(LogTemp, Warning, TEXT("STOT %f %f %f "), spawn_location.X, spawn_location.Y, spawn_location.Z);
+
 			//TODO
 			//const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
 			// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position

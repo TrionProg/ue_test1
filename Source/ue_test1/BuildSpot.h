@@ -20,13 +20,13 @@ class UE_TEST1_API ABuildSpot : public AActor
 	class UDecalComponent* decal;
 
 	//TODO is it static?
-	UPROPERTY(EditDefaultsOnly, Category = Enemy)
+	UPROPERTY(EditDefaultsOnly, Category = Turret)
 	TSubclassOf<class ATurret> Turret1;
 
-	UPROPERTY(EditDefaultsOnly, Category = Enemy)
+	UPROPERTY(EditDefaultsOnly, Category = Turret)
 	TSubclassOf<class ATurret> Turret2;
 
-	UPROPERTY(EditDefaultsOnly, Category = Enemy)
+	UPROPERTY(EditDefaultsOnly, Category = Turret)
 	TSubclassOf<class ATurret> Turret3;
 
 	ATurret *turret;

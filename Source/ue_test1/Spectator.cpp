@@ -51,7 +51,7 @@ void ASpectator::BeginPlay()
 
 	ABasicGameModeBase * game_mode = Cast<ABasicGameModeBase>(GetWorld()->GetAuthGameMode());
 	money = (float)game_mode->get_start_money();
-	
+	current_turret_type = 1;
 }
 
 // Called every frame
@@ -137,4 +137,36 @@ bool ASpectator::build(uint8 turret_type) {
 
 int32 ASpectator::get_money() {
 	return (int32)money;
+}
+
+//TODO unreachable, exception, enum
+FString ASpectator::get_turret_name(uint8 turret_type) {
+	switch (turret_type) {
+	case 1:
+		return turret1_name;
+	case 2:
+		return turret2_name;
+	case 3:
+		return turret3_name;
+	}
+
+	return TEXT("No such turret");
+}
+
+//TODO unreachable, exception, enum
+int32 ASpectator::get_turret_price(uint8 turret_type) {
+	switch (turret_type) {
+	case 1:
+		return turret1_price;
+	case 2:
+		return turret2_price;
+	case 3:
+		return turret3_price;
+	}
+
+	return 0;
+}
+
+void ASpectator::set_current_turret_type(uint8 turret_type) {
+	current_turret_type = turret_type;
 }
