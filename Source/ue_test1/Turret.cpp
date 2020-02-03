@@ -203,7 +203,9 @@ void ATurret::shoot() {
 		if (world != NULL)
 		{
 			const auto spawn_rotation = gun_body->GetComponentRotation();
-			const auto spawn_location = gun_body->GetComponentLocation();
+			 auto spawn_location = gun_body->GetComponentLocation();
+
+			spawn_location.Z = 60;
 			//TODO
 			//const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
 			// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position

@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "MyPlayerController.h"
-#include "Spectator.h"
+#include "MyHUD.h"
 
 
 AMyPlayerController::AMyPlayerController() {
@@ -14,6 +14,9 @@ void AMyPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	SetInputMode(FInputModeGameAndUI());
+
+	//TODO IsLocalController(). and move to controller
+	ChangeMenuWidget(StartingWidgetClass);
 }
 
 void AMyPlayerController::SetupInputComponent() {
@@ -29,20 +32,16 @@ void AMyPlayerController::SetupInputComponent() {
 
 void AMyPlayerController::PlayerTick(float dt) {
 	Super::PlayerTick(dt);
+
+	draw_money();
 }
 
 void AMyPlayerController::move_right(float value) {
-	auto pawn = GetPawn();
-	auto spectator = (ASpectator*)pawn;
-
-	spectator->move_right(value);
+	get_spectator()->move_right(value);
 }
 
 void AMyPlayerController::move_up(float value) {
-	auto pawn = GetPawn();
-	auto spectator = (ASpectator*)pawn;
-
-	spectator->move_up(value);
+	get_spectator()->move_up(value);
 }
 
 void AMyPlayerController::on_lmb_press() {
@@ -52,8 +51,47 @@ void AMyPlayerController::on_lmb_press() {
 void AMyPlayerController::on_lmb_release() {
 	UE_LOG(LogTemp, Warning, TEXT("Click"));
 
+	get_spectator()->build(1);
+}
+
+void AMyPlayerController::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)
+{
+	if (!IsLocalController()) {
+		return;
+	}
+
+	if (CurrentWidget != nullptr)
+	{
+		CurrentWidget->RemoveFromViewport();
+		CurrentWidget = nullptr;
+	}
+	if (NewWidgetClass != nullptr)
+	{
+		CurrentWidget = CreateWidget<UUserWidget>(GetWorld(), NewWidgetClass);
+		if (CurrentWidget != nullptr)
+		{
+			CurrentWidget->AddToViewport();
+		}
+	}
+}
+
+ASpectator* AMyPlayerController::get_spectator() {
 	auto pawn = GetPawn();
 	auto spectator = (ASpectator*)pawn;
 
-	spectator->build(1);
+	return spectator;
+}
+
+void AMyPlayerController::draw_money() {
+	if (CurrentWidget == nullptr) {
+		return;
+	}
+
+	auto spectator = get_spectator();
+
+	auto money = spectator->get_money();
+
+	auto hud = (UMyHUD*)CurrentWidget;
+
+	hud->SetMoney(money);
 }

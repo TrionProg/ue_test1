@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Spectator.h"
+
 #include "MyPlayerController.generated.h"
 
 /**
@@ -14,6 +16,19 @@ class UE_TEST1_API AMyPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 private:
+	/** Remove the current menu widget and create a new one from the specified class, if provided. */
+	UFUNCTION(BlueprintCallable, Category = "UMG Game")
+	void ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass);
+
+	ASpectator* get_spectator();
+	void draw_money();
+protected:
+	/** The widget class we will use as our menu when the game starts. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG Game")
+	TSubclassOf<UUserWidget> StartingWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* CurrentWidget;
 public:
 	AMyPlayerController();
 

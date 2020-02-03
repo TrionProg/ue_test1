@@ -44,7 +44,7 @@ void ABasicGameModeBase::InitGame(const FString& MapName, const FString& Options
 	//Super::InitGame(MapName, Options, ErrorMessage);
 }
 
-void ABasicGameModeBase::Tick(float DeltaSeconds) {
+void ABasicGameModeBase::Tick(float dt) {
 	//UE_LOG(LogTemp, Warning, TEXT("Tick"));
 
 	/*
@@ -75,27 +75,11 @@ int32 ABasicGameModeBase::get_start_money() {
 	return start_money;
 }
 
+float ABasicGameModeBase::get_money_increase() {
+	return money_increase;
+}
+
 void ABasicGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	//TODO IsLocalController(). and move to controller
-	ChangeMenuWidget(StartingWidgetClass);
-}
-
-void ABasicGameModeBase::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)
-{
-	if (CurrentWidget != nullptr)
-	{
-		CurrentWidget->RemoveFromViewport();
-		CurrentWidget = nullptr;
-	}
-	if (NewWidgetClass != nullptr)
-	{
-		CurrentWidget = CreateWidget<UUserWidget>(GetWorld(), NewWidgetClass);
-		if (CurrentWidget != nullptr)
-		{
-			CurrentWidget->AddToViewport();
-		}
-	}
 }

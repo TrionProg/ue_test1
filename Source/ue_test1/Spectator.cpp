@@ -59,6 +59,15 @@ void ASpectator::Tick(float dt)
 {
 	Super::Tick(dt);
 
+	ABasicGameModeBase * game_mode = Cast<ABasicGameModeBase>(GetWorld()->GetAuthGameMode());
+	money += game_mode->get_money_increase() * dt;
+
+	//ABasicGameModeBase * game_mode = Cast<ABasicGameModeBase>(GetWorld()->GetAuthGameMode());
+	//game_mode ->CurrentWidget->SetTex
+	
+	//game_mode->
+	//ABasicGameModeBase::CurrentWidget->
+
 	/*
 	if (CursorToWorld != nullptr)
 	{
