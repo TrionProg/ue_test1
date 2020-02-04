@@ -10,7 +10,7 @@
 #include "Turret.generated.h"
 
 const float TURRET_BARREL_NORMAL_POSITION = 50;
-const float TURRET_MUZZLE_POSITION = 70;
+const float TURRET_MUZZLE_POSITION = 90;
 
 UCLASS()
 class UE_TEST1_API ATurret : public APawn

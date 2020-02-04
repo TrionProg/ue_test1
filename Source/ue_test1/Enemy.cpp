@@ -7,6 +7,7 @@
 #include "Runtime/Engine/Classes/Components/StaticMeshComponent.h"
 
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
+#include "Runtime/Engine/Classes/Components/BoxComponent.h"
 
 
 // Sets default values
@@ -16,6 +17,8 @@ AEnemy::AEnemy()
 	PrimaryActorTick.bCanEverTick = true;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+
+	collision = CreateDefaultSubobject<UBoxComponent>(TEXT("Root"));
 
 	sphere1 = CreateDefaultSubobject<UStaticMeshComponent>("Sphere 1");
 	sphere2 = CreateDefaultSubobject<UStaticMeshComponent>("Sphere 2");
@@ -51,7 +54,7 @@ AEnemy::AEnemy()
 
 	//sphere3 = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 
-	
+	collision->SetupAttachment(RootComponent);
 	sphere1->SetupAttachment(RootComponent);
 	sphere2->SetupAttachment(RootComponent);
 	sphere3->SetupAttachment(RootComponent);
@@ -62,12 +65,21 @@ AEnemy::AEnemy()
 	sphere2->SetStaticMesh(MeshToUse.Object);
 	sphere3->SetStaticMesh(MeshToUse.Object);
 
-	
+	collision->SetWorldLocation(FVector(0.0, 0.0, 110.0));
+	collision->SetWorldScale3D(FVector(1,1,3.2));
+	collision->SetGenerateOverlapEvents(true);
+	collision->SetCollisionProfileName(TEXT("BlockAll"));
+
 	sphere1->SetWorldLocation(FVector(0.0, 0.0, 0.0));
+	sphere1->SetGenerateOverlapEvents(false);
+
 	sphere2->SetWorldLocation(FVector(0.0, 0.0, 90.0));
 	sphere2->SetWorldScale3D(FVector(0.75));
+	sphere2->SetGenerateOverlapEvents(false);
+
 	sphere3->SetRelativeLocation(FVector(0.0, 0.0, 160.0));
 	sphere3->SetRelativeScale3D(FVector(0.45));
+	sphere3->SetGenerateOverlapEvents(false);
 
 	max_health = 100;
 	max_speed = 1;
@@ -78,7 +90,7 @@ AEnemy::AEnemy()
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	 
 	health = max_health;
 	speed = max_speed;
 }
@@ -97,3 +109,16 @@ void AEnemy::Tick(float dt)
 	}
 }
 
+int32 AEnemy::get_reward() {
+	return reward;
+}
+
+void AEnemy::SlowDown(float dmg) {
+	UE_LOG(LogTemp, Warning, TEXT("Slow"));
+	if (speed < dmg) {
+		speed = 0;
+	}
+	else {
+		speed -= dmg;
+	}
+}

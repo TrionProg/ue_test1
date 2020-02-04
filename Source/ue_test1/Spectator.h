@@ -67,11 +67,12 @@ public:
 	void move_up(float value);
 	void move_right(float value);
 
-	bool build(uint8 turret_type);
+	bool build();
 	
 	int32 get_money();
 	uint8 get_current_turret_type();
 	void set_current_turret_type(uint8 turret_type);
 	FString get_turret_name(uint8 turret_type);
 	int32 get_turret_price(uint8 turret_type);
+	void give_money(int32 add_money);
 };

@@ -56,7 +56,7 @@ void AMyPlayerController::on_lmb_press() {
 void AMyPlayerController::on_lmb_release() {
 	UE_LOG(LogTemp, Warning, TEXT("Click"));
 
-	get_spectator()->build(1);
+	get_spectator()->build();
 }
 
 void AMyPlayerController::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)

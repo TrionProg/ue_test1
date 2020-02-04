@@ -108,7 +108,16 @@ void ASpectator::move_up(float value) {
 	root->AddLocalOffset(force_to_add);
 }
 
-bool ASpectator::build(uint8 turret_type) {
+bool ASpectator::build() {
+	auto turret_type = current_turret_type;
+	auto turret_price = get_turret_price(turret_type);
+
+	if (money < turret_price) {
+		return false;
+	}
+
+	money -= turret_price;
+
 	if (APlayerController* PC = Cast<APlayerController>(GetController())) {
 		FHitResult TraceHitResult;
 		PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
@@ -169,4 +178,8 @@ int32 ASpectator::get_turret_price(uint8 turret_type) {
 
 void ASpectator::set_current_turret_type(uint8 turret_type) {
 	current_turret_type = turret_type;
+}
+
+void ASpectator::give_money(int32 add_money) {
+	money += add_money;
 }

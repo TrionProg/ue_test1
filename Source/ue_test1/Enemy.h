@@ -12,7 +12,14 @@ UCLASS()
 class UE_TEST1_API AEnemy : public AActor
 {
 	GENERATED_BODY()
-public:
+private:
+	f32 health;
+	f32 speed;
+
+protected:
+	UPROPERTY(EditAnyWhere)
+	UShapeComponent* collision;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* sphere1;
 	
@@ -29,9 +36,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float speed_increase;
-	
-	f32 health;
-	f32 speed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 reward;
 public:	
 	// Sets default values for this actor's properties
 	AEnemy();
@@ -40,10 +47,13 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION(BlueprintCallable)
+	void SlowDown(float dmg);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	
+	int32 get_reward();
 	
 };
