@@ -20,7 +20,6 @@ private:
 	UFUNCTION(BlueprintCallable, Category = "UMG Game")
 	void ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass);
 
-	ASpectator* get_spectator();
 	void draw_money();
 
 	void select_turret_type(uint8 turret_type);
@@ -33,6 +32,8 @@ protected:
 	UUserWidget* CurrentWidget;
 public:
 	AMyPlayerController();
+
+	ASpectator* get_spectator();
 
 protected:
 	virtual void BeginPlay() override;

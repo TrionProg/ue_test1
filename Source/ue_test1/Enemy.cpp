@@ -8,6 +8,9 @@
 
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "Runtime/Engine/Classes/Components/BoxComponent.h"
+#include "MyPlayerController.h"
+#include "Turret.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 
 // Sets default values
@@ -84,6 +87,9 @@ AEnemy::AEnemy()
 	max_health = 100;
 	max_speed = 1;
 	speed_increase = 0.1;
+
+	this->OnTakeAnyDamage.AddDynamic(this, &AEnemy::TakeDamage);
+	this->OnDestroyed.AddDynamic(this, &AEnemy::Destroyed);
 }
 
 // Called when the game starts or when spawned
@@ -121,4 +127,50 @@ void AEnemy::SlowDown(float dmg) {
 	else {
 		speed -= dmg;
 	}
+}
+
+void AEnemy::TakeDamage(AActor* DamagedActor, float damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser) {
+	if (health <= damage) {
+		health = 0;
+
+		if (InstigatedBy) {
+			auto controller = Cast<AMyPlayerController>(InstigatedBy);
+
+			if (controller) {
+				auto spectator = controller->get_spectator();
+
+				if (spectator) {
+					auto reward = get_reward();
+					spectator->give_money(reward);
+				}
+			}
+		}
+
+		Destroy();
+	}else {
+		health -= damage;
+	}
+}
+
+void AEnemy::Destroyed(AActor* DestroyedActor) {
+	UE_LOG(LogTemp, Warning, TEXT("Destroyed"));
+
+	auto world = GetWorld();
+
+	if (world) {
+		TArray<AActor*> found_actors;
+
+		UGameplayStatics::GetAllActorsOfClass((UObject*)world, ATurret::StaticClass(), found_actors);
+
+		for (AActor* abstract_actor : found_actors) {
+			UE_LOG(LogTemp, Warning, TEXT("Turret"));
+			ATurret* turret = Cast<ATurret>(abstract_actor);
+
+			turret->on_enemy_died(this);
+		}
+	}
+}
+
+bool AEnemy::is_alive() {
+	return health > 0;
 }

@@ -183,15 +183,17 @@ void ATurret::find_target() {
 		AEnemy* enemy = Cast<AEnemy>(abstract_actor);
 
 		if (enemy != nullptr) {
-			auto location = enemy->GetActorLocation();
+			if (enemy->is_alive()) {
+				auto location = enemy->GetActorLocation();
 
-			auto dist = FVector::Dist2D(position, location);
+				auto dist = FVector::Dist2D(position, location);
 
-			if (dist < min_dist) {
-				//TODO trace (LineTrace)
+				if (dist < min_dist) {
+					//TODO trace (LineTrace)
 
-				min_dist = dist;
-				target_enemy = enemy;
+					min_dist = dist;
+					target_enemy = enemy;
+				}
 			}
 		}
 	}
@@ -251,6 +253,7 @@ void ATurret::animate_shoot() {
 
 void ATurret::on_enemy_died(AEnemy* enemy) {
 	if (target == enemy) {
+		UE_LOG(LogTemp, Warning, TEXT("MyEnemy"));
 		target = nullptr;
 		find_target();
 	}

@@ -50,10 +50,17 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void SlowDown(float dmg);
 
+	UFUNCTION()
+	void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+
+	UFUNCTION()
+	void Destroyed(AActor* DestroyedActor);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	int32 get_reward();
+	bool is_alive();
 	
 };
