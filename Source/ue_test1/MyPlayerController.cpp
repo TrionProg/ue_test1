@@ -6,6 +6,7 @@
 
 AMyPlayerController::AMyPlayerController() {
 	bShowMouseCursor = true;
+	paused = false;
 	//DefaultMouseCursor = EMouseCursor::Crosshairs;
 
 }
@@ -33,6 +34,11 @@ void AMyPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("Turret1", IE_Released, this, &AMyPlayerController::on_key1_release);
 	InputComponent->BindAction("Turret2", IE_Released, this, &AMyPlayerController::on_key2_release);
 	InputComponent->BindAction("Turret3", IE_Released, this, &AMyPlayerController::on_key3_release);
+
+	InputComponent->BindAction("Pause", IE_Released, this, &AMyPlayerController::on_key_space_release).bExecuteWhenPaused = true;
+	//InputComponent->BindAction("TogglePause", EInputEvent::IE_Pressed, this, &MyPlayerController::TogglePause).bExecuteWhenPaused = true;
+
+	//TODO some code:InputComponent->BindAction("TogglePause", EInputEvent::IE_Pressed, this, &MyPlayerController::TogglePause).bExecuteWhenPaused = true;
 }
 
 void AMyPlayerController::PlayerTick(float dt) {
@@ -127,4 +133,14 @@ void AMyPlayerController::select_turret_type(uint8 turret_type) {
 	auto hud = (UMyHUD*)CurrentWidget;
 
 	hud->SetCurrentTurret(turret_name, turret_price);
+}
+
+void AMyPlayerController::on_key_space_release() {
+	pause();
+}
+
+void AMyPlayerController::pause() {
+	UE_LOG(LogTemp, Warning, TEXT("Pause"));
+	paused = !paused;
+	this->SetPause(paused);
 }

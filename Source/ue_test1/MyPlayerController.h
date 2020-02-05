@@ -23,6 +23,8 @@ private:
 	void draw_money();
 
 	void select_turret_type(uint8 turret_type);
+
+	bool paused;
 protected:
 	/** The widget class we will use as our menu when the game starts. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG Game")
@@ -49,4 +51,7 @@ protected:
 	void on_key1_release();
 	void on_key2_release();
 	void on_key3_release();
+	void on_key_space_release();
+	
+	void pause();
 };

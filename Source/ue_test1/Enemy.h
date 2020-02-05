@@ -5,11 +5,11 @@
 #include "primitives.h"
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "GameFramework/Pawn.h"
 #include "Enemy.generated.h"
 
 UCLASS()
-class UE_TEST1_API AEnemy : public AActor
+class UE_TEST1_API AEnemy : public APawn
 {
 	GENERATED_BODY()
 private:
