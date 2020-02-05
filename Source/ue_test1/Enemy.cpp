@@ -137,9 +137,7 @@ void AEnemy::TakeDamage(AActor* DamagedActor, float damage, const class UDamageT
 			auto controller = Cast<AMyPlayerController>(InstigatedBy);
 
 			if (controller) {
-				auto spectator = controller->get_spectator();
-
-				if (spectator) {
+				if (auto spectator = controller->get_spectator().match()) {
 					auto reward = get_reward();
 					spectator->give_money(reward);
 				}

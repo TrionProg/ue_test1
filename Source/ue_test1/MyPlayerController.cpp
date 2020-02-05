@@ -2,6 +2,7 @@
 
 #include "MyPlayerController.h"
 #include "MyHUD.h"
+#include "BasicGameModeBase.h"
 
 
 AMyPlayerController::AMyPlayerController() {
@@ -36,6 +37,7 @@ void AMyPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("Turret3", IE_Released, this, &AMyPlayerController::on_key3_release);
 
 	InputComponent->BindAction("Pause", IE_Released, this, &AMyPlayerController::on_key_space_release).bExecuteWhenPaused = true;
+	InputComponent->BindAction("Restart", IE_Released, this, &AMyPlayerController::on_key_r_release).bExecuteWhenPaused = true;
 	//InputComponent->BindAction("TogglePause", EInputEvent::IE_Pressed, this, &MyPlayerController::TogglePause).bExecuteWhenPaused = true;
 
 	//TODO some code:InputComponent->BindAction("TogglePause", EInputEvent::IE_Pressed, this, &MyPlayerController::TogglePause).bExecuteWhenPaused = true;
@@ -48,11 +50,15 @@ void AMyPlayerController::PlayerTick(float dt) {
 }
 
 void AMyPlayerController::move_right(float value) {
-	get_spectator()->move_right(value);
+	if (auto spectator = get_spectator().match()) {
+		spectator->move_right(value);
+	}
 }
 
 void AMyPlayerController::move_up(float value) {
-	get_spectator()->move_up(value);
+	if (auto spectator = get_spectator().match()) {
+		spectator->move_up(value);
+	}
 }
 
 void AMyPlayerController::on_lmb_press() {
@@ -62,7 +68,9 @@ void AMyPlayerController::on_lmb_press() {
 void AMyPlayerController::on_lmb_release() {
 	UE_LOG(LogTemp, Warning, TEXT("Click"));
 
-	get_spectator()->build();
+	if (auto spectator = get_spectator().match()) {
+		spectator->build();
+	}
 }
 
 void AMyPlayerController::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)
@@ -86,11 +94,11 @@ void AMyPlayerController::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetCla
 	}
 }
 
-ASpectator* AMyPlayerController::get_spectator() {
+OptionPtr<ASpectator> AMyPlayerController::get_spectator() { //TODO On reset may be nullptr
 	auto pawn = GetPawn();
 	auto spectator = (ASpectator*)pawn;
 
-	return spectator;
+	return OptionPtr<ASpectator>::new_unchecked(spectator);
 }
 
 void AMyPlayerController::draw_money() {
@@ -98,13 +106,13 @@ void AMyPlayerController::draw_money() {
 		return;
 	}
 
-	auto spectator = get_spectator();
+	if (auto spectator = get_spectator().match()) {
+		auto money = spectator->get_money();
 
-	auto money = spectator->get_money();
+		auto hud = (UMyHUD*)CurrentWidget;
 
-	auto hud = (UMyHUD*)CurrentWidget;
-
-	hud->SetMoney(money);
+		hud->SetMoney(money);
+	}
 }
 
 void AMyPlayerController::on_key1_release() {
@@ -120,27 +128,42 @@ void AMyPlayerController::on_key3_release() {
 }
 
 void AMyPlayerController::select_turret_type(uint8 turret_type) {
-	auto spectator = get_spectator();
-	auto turret_name = spectator->get_turret_name(turret_type);
-	auto turret_price = spectator->get_turret_price(turret_type);
+	if (auto spectator = get_spectator().match()) {
+		auto turret_name = spectator->get_turret_name(turret_type);
+		auto turret_price = spectator->get_turret_price(turret_type);
 
-	get_spectator()->set_current_turret_type(turret_type);
+		spectator->set_current_turret_type(turret_type);
 
-	if (!IsLocalController()) {
-		return;
+		if (!IsLocalController()) {
+			return;
+		}
+
+		auto hud = (UMyHUD*)CurrentWidget;
+
+		hud->SetCurrentTurret(turret_name, turret_price);
 	}
-
-	auto hud = (UMyHUD*)CurrentWidget;
-
-	hud->SetCurrentTurret(turret_name, turret_price);
 }
 
 void AMyPlayerController::on_key_space_release() {
 	pause();
 }
 
+void AMyPlayerController::on_key_r_release() {
+	restart_game();
+}
+
 void AMyPlayerController::pause() {
 	UE_LOG(LogTemp, Warning, TEXT("Pause"));
 	paused = !paused;
 	this->SetPause(paused);
+}
+
+void AMyPlayerController::restart_game() {
+	UE_LOG(LogTemp, Warning, TEXT("Restart"));
+	ABasicGameModeBase * game_mode = Cast<ABasicGameModeBase>(GetWorld()->GetAuthGameMode());
+
+	if (game_mode) {
+		game_mode->restart_game();
+	}
+	//game_mode->ResetLevel();
 }

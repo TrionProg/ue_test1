@@ -32,6 +32,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GameplayConfig)
 	int32 money_increase;
+protected:
+	UFUNCTION(BlueprintImplementableEvent)
+	void RestartGame();
 
 protected:
 	/** Called when the game starts. */
@@ -46,4 +49,5 @@ public:
 
 	int32 get_start_money();
 	float get_money_increase();
+	void restart_game();
 };

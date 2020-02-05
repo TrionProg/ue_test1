@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "Spectator.h"
+#include "OptionPtr.h"
 
 #include "MyPlayerController.generated.h"
 
@@ -35,7 +36,7 @@ protected:
 public:
 	AMyPlayerController();
 
-	ASpectator* get_spectator();
+	OptionPtr<ASpectator> get_spectator();
 
 protected:
 	virtual void BeginPlay() override;
@@ -52,6 +53,8 @@ protected:
 	void on_key2_release();
 	void on_key3_release();
 	void on_key_space_release();
+	void on_key_r_release();
 	
 	void pause();
+	void restart_game();
 };

@@ -31,17 +31,8 @@ ABasicGameModeBase::ABasicGameModeBase(): Super() {
 
 
 void ABasicGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) {
+	UE_LOG(LogTemp, Warning, TEXT("InitGame %s %s"), *MapName, *Options);
 	Super::InitGame(MapName, Options, ErrorMessage);
-
-	UE_LOG(LogTemp, Warning, TEXT("InitGame"));
-
-	for (float i = -400; i < 600; i+=130) {
-		auto pos = FVector(800, i, 0);
-
-		AActor* my_actor = (AActor*)GetWorld()->SpawnActor(WeakEnemy, &pos);
-	}
-
-	//Super::InitGame(MapName, Options, ErrorMessage);
 }
 
 void ABasicGameModeBase::Tick(float dt) {
@@ -82,4 +73,18 @@ float ABasicGameModeBase::get_money_increase() {
 void ABasicGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UE_LOG(LogTemp, Warning, TEXT("BeginPlay"));
+
+	for (float i = -400; i < 600; i += 130) {
+		auto pos = FVector(800, i, 0);
+
+		AActor* my_actor = (AActor*)GetWorld()->SpawnActor(WeakEnemy, &pos);
+	}
+}
+
+void ABasicGameModeBase::restart_game() {
+	UE_LOG(LogTemp, Warning, TEXT("Reset"));
+	//RestartGame();
+	ResetLevel();
 }

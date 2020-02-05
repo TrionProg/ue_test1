@@ -97,12 +97,14 @@ void ASpectator::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 }
 
 void ASpectator::move_right(float value) {
+	UE_LOG(LogTemp, Warning, TEXT("move_right"));
 	FVector force_to_add = movement_force * value * FVector(0, 1, 0);
 	auto root = (USceneComponent*)RootComponent;
 	root->AddLocalOffset(force_to_add);
 }
 
 void ASpectator::move_up(float value) {
+	UE_LOG(LogTemp, Warning, TEXT("move_up"));
 	FVector force_to_add = movement_force * value * FVector(1, 0, 0);
 	auto root = (USceneComponent*)RootComponent;
 	root->AddLocalOffset(force_to_add);
