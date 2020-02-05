@@ -6,6 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "Enemy.h"
 #include "Projectile.h"
+#include "OptionPtr.h"
 
 #include "Turret.generated.h"
 
@@ -38,9 +39,9 @@ public:
 	uint8 type;
 
 private:
-	AEnemy* target;
+	OptionPtr<AEnemy> target;
 	float shot_interval_progress;
-	//float 
+	
 public:
 	// Sets default values for this pawn's properties
 	ATurret();

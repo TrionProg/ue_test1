@@ -46,7 +46,7 @@ ATurret::ATurret()
 	gun_lamp->SetRelativeScale3D(FVector(0.6, 0.4, 0.2));
 	gun_muzzle->SetRelativeLocation(FVector(TURRET_MUZZLE_POSITION, 0.0, 30.0));
 
-	target = nullptr;
+	target = OptionPtr<AEnemy>::new_none();
 	shot_interval_progress = shot_interval;
 }
 
@@ -55,7 +55,7 @@ void ATurret::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	target = nullptr;
+	target.reset();
 	shot_interval_progress = shot_interval;
 }
 
@@ -74,18 +74,17 @@ void ATurret::Tick(float dt)
 		animate_shoot();
 	}
 
-	if (target == nullptr) {
+	if (target.is_none()) {
 		find_target();
 	}
 
-	if (target != nullptr) {
-		auto location = target->GetActorLocation();
+	if (auto current_target = target.match()) {
+		auto location = current_target->GetActorLocation();
 
 		auto rotator = look_at(location, FVector(0, 0, 1));
 		gun_body->SetWorldRotation(rotator);
 
 		if (shot_interval_progress == shot_interval) {
-			//Shoot
 			shoot();
 		}
 	}
@@ -176,7 +175,7 @@ void ATurret::find_target() {
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), found_actors);
 
 	auto position = GetActorLocation();
-	AEnemy* target_enemy = nullptr;
+	auto found_target=OptionPtr<AEnemy>::new_none();
 	float min_dist = MAX_FLT;
 
 	for (AActor* abstract_actor : found_actors) {
@@ -192,13 +191,15 @@ void ATurret::find_target() {
 					//TODO trace (LineTrace)
 
 					min_dist = dist;
-					target_enemy = enemy;
+					found_target.set(enemy);
 				}
 			}
 		}
 	}
 
-	target = target_enemy;
+	if (auto fnd_target = found_target.match()) {
+		target.set(fnd_target);
+	}
 }
 
 void ATurret::shoot() {
@@ -252,10 +253,12 @@ void ATurret::animate_shoot() {
 }
 
 void ATurret::on_enemy_died(AEnemy* enemy) {
-	if (target == enemy) {
-		UE_LOG(LogTemp, Warning, TEXT("MyEnemy"));
-		target = nullptr;
-		find_target();
+	if (auto current_target = target.match()) {
+		if (current_target == enemy) {
+			UE_LOG(LogTemp, Warning, TEXT("MyEnemy"));
+			target.reset();
+			find_target();
+		}
 	}
 }
 
