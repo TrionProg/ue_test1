@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
+//#include "GameFramework/GameModeBase.h"
+#include "GameFramework/GameMode.h"
 #include "Enemy.h"
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "Blueprint/UserWidget.h"
@@ -14,7 +15,7 @@
  * 
  */
 UCLASS()
-class UE_TEST1_API ABasicGameModeBase : public AGameModeBase
+class UE_TEST1_API ABasicGameModeBase : public AGameMode
 {
 	GENERATED_BODY()
 public:
@@ -33,8 +34,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GameplayConfig)
 	int32 money_increase;
 protected:
-	UFUNCTION(BlueprintImplementableEvent)
-	void RestartGame();
+	//UFUNCTION(BlueprintImplementableEvent)
+	//void RestartGame();
+
+	bool should_restart;
 
 protected:
 	/** Called when the game starts. */
@@ -61,4 +64,26 @@ public:
 	virtual void Logout(AController* Exiting);
 	//SpawnDefaultPawnAtTransform
 
+
+	void HandleDisconnect
+	(
+		UWorld* InWorld,
+		UNetDriver* NetDriver
+	);
+
+	/** Called when the state transitions to InProgress */
+	virtual void HandleMatchHasStarted();
+
+	/** Called when the map transitions to WaitingPostMatch */
+	virtual void HandleMatchHasEnded();
+
+	/** Called when the match transitions to LeavingMap */
+	virtual void HandleLeavingMap();
+
+	/** Called when the match transitions to Aborted */
+	virtual void HandleMatchAborted();
+
+	void HandleMatchIsWaitingToStart();
+
+	//void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer);
 };

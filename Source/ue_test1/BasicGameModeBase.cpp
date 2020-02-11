@@ -15,6 +15,8 @@ ABasicGameModeBase::ABasicGameModeBase(): Super() {
 	DefaultPawnClass = ASpectator::StaticClass(); 
 	PlayerControllerClass = AMyPlayerController::StaticClass();
 
+	should_restart = false;
+
 	/*
 	//Use blueprint Specrator
 	static ConstructorHelpers::FClassFinder<APawn> FoundFPC(TEXT("/Game/Blueprints/SpectatorBlueprint"));
@@ -76,14 +78,6 @@ float ABasicGameModeBase::get_money_increase() {
 void ABasicGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	UE_LOG(LogTemp, Warning, TEXT("BeginPlay"));
-
-	for (float i = -400; i < 600; i += 130) {
-		auto pos = FVector(800, i, 0);
-
-		AActor* my_actor = (AActor*)GetWorld()->SpawnActor(WeakEnemy, &pos);
-	}
 }
 
 /*
@@ -107,8 +101,14 @@ void ABasicGameModeBase::RestartPlayer(AController* NewPlayer) {
 
 void ABasicGameModeBase::restart_game() {
 	UE_LOG(LogTemp, Warning, TEXT("Reset"));
-	//RestartGame();
-	ResetLevel();
+	//RestartGame(); //Works, but not fully correctly
+
+	should_restart = true;
+
+	EndMatch();
+	//StartMatch()
+
+	//ResetLevel();
 }
 
 void ABasicGameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)  {
@@ -143,3 +143,69 @@ void ABasicGameModeBase::Logout(AController* Exiting) {
 	UE_LOG(LogTemp, Warning, TEXT("Logout"));
 	Super::Logout(Exiting);
 }
+
+void ABasicGameModeBase::HandleDisconnect
+(
+	UWorld* InWorld,
+	UNetDriver* NetDriver
+) {
+	UE_LOG(LogTemp, Warning, TEXT("HandleDisconnect"));
+	Super::HandleDisconnect(InWorld, NetDriver);
+}
+
+/** Called when the state transitions to InProgress */
+void ABasicGameModeBase::HandleMatchHasStarted() {
+	UE_LOG(LogTemp, Warning, TEXT("HandleMatchHasStarted"));
+	Super::HandleMatchHasStarted();
+
+	UE_LOG(LogTemp, Warning, TEXT("BeginPlay"));
+
+	for (float i = -400; i < 600; i += 130) {
+		auto pos = FVector(800, i, 0);
+
+		AActor* my_actor = (AActor*)GetWorld()->SpawnActor(WeakEnemy, &pos);
+	}
+}
+
+/** Called when the map transitions to WaitingPostMatch */
+void ABasicGameModeBase::HandleMatchHasEnded() {
+	UE_LOG(LogTemp, Warning, TEXT("HandleMatchHasEnded"));
+	Super::HandleMatchHasEnded();
+
+	if (should_restart) {
+		ResetLevel();
+		UE_LOG(LogTemp, Warning, TEXT("TODO:How long reset?"));
+		SetMatchState(MatchState::WaitingToStart);
+		//StartMatch();
+		//StartPlay();
+	}
+}
+
+/** Called when the match transitions to LeavingMap */
+void ABasicGameModeBase::HandleLeavingMap() {
+	UE_LOG(LogTemp, Warning, TEXT("HandleLeavingMap"));
+	Super::HandleLeavingMap();
+}
+
+/** Called when the match transitions to Aborted */
+void ABasicGameModeBase::HandleMatchAborted() {
+	UE_LOG(LogTemp, Warning, TEXT("HandleMatchAborted"));
+	Super::HandleMatchAborted();
+}
+
+void ABasicGameModeBase::HandleMatchIsWaitingToStart() {
+	UE_LOG(LogTemp, Warning, TEXT("HandleMatchIsWaitingToStart"));
+	Super::HandleMatchIsWaitingToStart();
+
+	if (should_restart) {
+		should_restart = false;
+		UE_LOG(LogTemp, Warning, TEXT("Start match!"));
+		StartMatch();
+	}
+}
+
+/*
+void ABasicGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) {
+
+}
+*/
