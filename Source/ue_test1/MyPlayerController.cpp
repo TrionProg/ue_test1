@@ -3,6 +3,8 @@
 #include "MyPlayerController.h"
 #include "MyHUD.h"
 #include "BasicGameModeBase.h"
+#include "Spectator.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 
 AMyPlayerController::AMyPlayerController() {
@@ -15,12 +17,32 @@ AMyPlayerController::AMyPlayerController() {
 void AMyPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	/*
+
+	TArray<AActor*> found_actors;
+
+	UGameplayStatics::GetAllActorsOfClass((UObject*)GetWorld(), ASpectator::StaticClass(), found_actors);
+
+	UE_LOG(LogTemp, Warning, TEXT("Controller beg play"));
+
+	for (AActor* abstract_actor : found_actors) {
+		ASpectator* spec = Cast<ASpectator>(abstract_actor);
+
+		if (spec) {
+			UE_LOG(LogTemp, Warning, TEXT("Spec!!!!"));
+			Possess(spec);
+		}
+	}
+	*/
+
 	SetInputMode(FInputModeGameAndUI());
 
 	//TODO IsLocalController(). and move to controller
 	ChangeMenuWidget(StartingWidgetClass);
 	select_turret_type(1);
 }
+
 
 void AMyPlayerController::SetupInputComponent() {
 	// set up gameplay key bindings
@@ -45,6 +67,27 @@ void AMyPlayerController::SetupInputComponent() {
 
 void AMyPlayerController::PlayerTick(float dt) {
 	Super::PlayerTick(dt);
+
+	//Костыль
+
+	if (get_spectator().is_none()) {
+		UE_LOG(LogTemp, Warning, TEXT("Kostil"));
+		TArray<AActor*> found_actors;
+
+		UGameplayStatics::GetAllActorsOfClass((UObject*)GetWorld(), ASpectator::StaticClass(), found_actors);
+
+		for (AActor* abstract_actor : found_actors) {
+			UE_LOG(LogTemp, Warning, TEXT("ggg"));
+			ASpectator* spec = Cast<ASpectator>(abstract_actor);
+
+			if (spec) {
+				UE_LOG(LogTemp, Warning, TEXT("Spec!!!!"));
+				Possess(spec);
+			}
+		}
+	}
+
+	//UE_LOG(LogTemp, Warning, TEXT("Pl Tick"));
 
 	draw_money();
 }
@@ -166,4 +209,28 @@ void AMyPlayerController::restart_game() {
 		game_mode->restart_game();
 	}
 	//game_mode->ResetLevel();
+}
+
+/** Reset actor to initial state - used when restarting level without reloading. */
+void AMyPlayerController::Reset() {
+	Super::Reset();
+	UE_LOG(LogTemp, Warning, TEXT("Reset Controller"));
+
+	/*
+	//Костыль не работает т.к. далее резет спектатора.
+
+	TArray<AActor*> found_actors;
+
+	UGameplayStatics::GetAllActorsOfClass((UObject*)GetWorld(), ASpectator::StaticClass(), found_actors);
+
+	for (AActor* abstract_actor : found_actors) {
+		ASpectator* spec = Cast<ASpectator>(abstract_actor);
+
+		if (spec) {
+			//UE_LOG(LogTemp, Warning, TEXT("Spec!!!!"));
+			Possess(spec);
+			return;
+		}
+	}
+	*/
 }

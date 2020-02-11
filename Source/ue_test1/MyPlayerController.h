@@ -57,4 +57,7 @@ protected:
 	
 	void pause();
 	void restart_game();
+
+	/** Reset actor to initial state - used when restarting level without reloading. */
+	virtual void Reset();
 };

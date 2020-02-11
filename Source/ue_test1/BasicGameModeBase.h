@@ -50,4 +50,15 @@ public:
 	int32 get_start_money();
 	float get_money_increase();
 	void restart_game();
+
+	virtual void PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+	virtual void HandleStartingNewPlayer(APlayerController* NewPlayer);
+	virtual void RestartPlayer(AController* NewPlayer);
+	virtual void RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot);
+	virtual void RestartPlayerAtTransform(AController* NewPlayer, const FTransform& SpawnTransform);
+	virtual void SpawnDefaultPawnAtTransform(AController* NewPlayer, const FTransform& SpawnTransform);
+	virtual void Logout(AController* Exiting);
+	//SpawnDefaultPawnAtTransform
+
 };

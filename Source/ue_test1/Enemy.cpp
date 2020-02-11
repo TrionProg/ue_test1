@@ -164,7 +164,9 @@ void AEnemy::Destroyed(AActor* DestroyedActor) {
 			UE_LOG(LogTemp, Warning, TEXT("Turret"));
 			ATurret* turret = Cast<ATurret>(abstract_actor);
 
-			turret->on_enemy_died(this);
+			if (turret) {
+				turret->on_enemy_died(this);
+			}
 		}
 	}
 }

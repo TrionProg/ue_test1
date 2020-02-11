@@ -13,6 +13,7 @@
 // Sets default values
 ASpectator::ASpectator()
 {
+	//Super::AActor();
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -42,6 +43,7 @@ ASpectator::ASpectator()
 
 	//static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshToUse(TEXT("StaticMesh'/Game/MyMesh.MyMesh");
 	//MeshComponent->SetStaticMesh(MeshToUse.Object);
+	this->OnDestroyed.AddDynamic(this, &ASpectator::Destroyed);
 }
 
 // Called when the game starts or when spawned
@@ -58,6 +60,8 @@ void ASpectator::BeginPlay()
 void ASpectator::Tick(float dt)
 {
 	Super::Tick(dt);
+
+	UE_LOG(LogTemp, Warning, TEXT("Spec tick %f"), money);
 
 	ABasicGameModeBase * game_mode = Cast<ABasicGameModeBase>(GetWorld()->GetAuthGameMode());
 	money += game_mode->get_money_increase() * dt;
@@ -116,8 +120,6 @@ bool ASpectator::build() {
 		return false;
 	}
 
-	money -= turret_price;
-
 	if (APlayerController* PC = Cast<APlayerController>(GetController())) {
 		FHitResult TraceHitResult;
 		PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
@@ -135,7 +137,12 @@ bool ASpectator::build() {
 				auto dist = FVector::Dist2D(cursor_position, location);
 
 				if (dist <BUILDSPOT_CLICK_RADUS) {
-					return build_spot->build(turret_type);
+					if (build_spot->build(turret_type)) {
+						money -= turret_price;
+						return true;
+					}
+
+					return false;
 				}
 			}
 		}
@@ -182,4 +189,20 @@ void ASpectator::set_current_turret_type(uint8 turret_type) {
 
 void ASpectator::give_money(int32 add_money) {
 	money += add_money;
+}
+
+void ASpectator::Reset() {
+	Super::Reset();
+	UE_LOG(LogTemp, Warning, TEXT("Reset Spec"));
+
+	//TODO maybe possess here?
+}
+
+void ASpectator::Restart() {
+	Super::Restart();
+	UE_LOG(LogTemp, Warning, TEXT("Restart Spec"));
+}
+
+void ASpectator::Destroyed(AActor* DestroyedActor) {
+	UE_LOG(LogTemp, Warning, TEXT("ASpectator Destroyed"));
 }

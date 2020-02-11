@@ -49,6 +49,10 @@ private:
 
 	uint8 current_turret_type;
 
+protected:
+	UFUNCTION()
+	void Destroyed(AActor* DestroyedActor);
+
 public:
 	// Sets default values for this pawn's properties
 	ASpectator();
@@ -75,4 +79,8 @@ public:
 	FString get_turret_name(uint8 turret_type);
 	int32 get_turret_price(uint8 turret_type);
 	void give_money(int32 add_money);
+	void Reset();
+
+	/** Called when the Pawn is being restarted (usually by being possessed by a Controller). */
+	virtual void Restart();
 };

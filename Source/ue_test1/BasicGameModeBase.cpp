@@ -2,6 +2,7 @@
 
 #include "BasicGameModeBase.h"
 #include "Spectator.h"
+#include "MyPlayerController.h"
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "Runtime/Engine/Classes/Components/ActorComponent.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
@@ -12,6 +13,7 @@ ABasicGameModeBase::ABasicGameModeBase(): Super() {
 
 	//Use C++ Spectator
 	DefaultPawnClass = ASpectator::StaticClass(); 
+	PlayerControllerClass = AMyPlayerController::StaticClass();
 
 	/*
 	//Use blueprint Specrator
@@ -36,6 +38,7 @@ void ABasicGameModeBase::InitGame(const FString& MapName, const FString& Options
 }
 
 void ABasicGameModeBase::Tick(float dt) {
+	//UE_LOG(LogTemp, Warning, TEXT("Gameplay Tick"));
 	//UE_LOG(LogTemp, Warning, TEXT("Tick"));
 
 	/*
@@ -83,8 +86,60 @@ void ABasicGameModeBase::BeginPlay()
 	}
 }
 
+/*
+void ABasicGameModeBase::RestartPlayer(AController* NewPlayer) {
+		Super::RestartPlayer(NewPlayer);
+		UE_LOG(LogTemp, Warning, TEXT("RestartPlayer play"));
+
+		for (float i = -400; i < 600; i += 130) {
+			auto pos = FVector(800, i, 0);
+
+			AActor* my_actor = (AActor*)GetWorld()->SpawnActor(WeakEnemy, &pos);
+		}
+
+		auto pos = FVector(200, 0, 0);
+
+		//AActor* spectator = (AActor*)GetWorld()->SpawnActor(DefaultPawnClass, &pos);
+		//Contrller
+		//RestartPlayer()
+}
+*/
+
 void ABasicGameModeBase::restart_game() {
 	UE_LOG(LogTemp, Warning, TEXT("Reset"));
 	//RestartGame();
 	ResetLevel();
+}
+
+void ABasicGameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)  {
+	UE_LOG(LogTemp, Warning, TEXT("PreLogin"));
+	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
+}
+void ABasicGameModeBase::PostLogin(APlayerController* NewPlayer) {
+	UE_LOG(LogTemp, Warning, TEXT("PostLogin"));
+	Super::PostLogin(NewPlayer);
+}
+void ABasicGameModeBase::HandleStartingNewPlayer(APlayerController* NewPlayer) {
+	UE_LOG(LogTemp, Warning, TEXT("HandleStartingNewPlayer"));
+	Super::HandleStartingNewPlayer(NewPlayer);
+}
+void ABasicGameModeBase::RestartPlayer(AController* NewPlayer) {
+	UE_LOG(LogTemp, Warning, TEXT("RestartPlayer"));
+	Super::RestartPlayer(NewPlayer);
+}
+void ABasicGameModeBase::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot) {
+	UE_LOG(LogTemp, Warning, TEXT("RestartPlayerAtPlayerStart"));
+	Super::RestartPlayerAtPlayerStart(NewPlayer, StartSpot);
+}
+void ABasicGameModeBase::RestartPlayerAtTransform(AController* NewPlayer, const FTransform& SpawnTransform) {
+	UE_LOG(LogTemp, Warning, TEXT("RestartPlayerAtTransform"));
+	Super::RestartPlayerAtTransform(NewPlayer, SpawnTransform);
+}
+void ABasicGameModeBase::SpawnDefaultPawnAtTransform(AController* NewPlayer, const FTransform& SpawnTransform) {
+	UE_LOG(LogTemp, Warning, TEXT("SpawnDefaultPawnAtTransform"));
+	Super::SpawnDefaultPawnAtTransform(NewPlayer, SpawnTransform);
+}
+void ABasicGameModeBase::Logout(AController* Exiting) {
+	UE_LOG(LogTemp, Warning, TEXT("Logout"));
+	Super::Logout(Exiting);
 }
