@@ -6,6 +6,8 @@
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "Runtime/Engine/Classes/Components/ActorComponent.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "BasicGameStateBase.h"
+#include "Runtime/Engine/Classes/Engine/World.h"
 
 
 ABasicGameModeBase::ABasicGameModeBase(): Super() {
@@ -15,7 +17,7 @@ ABasicGameModeBase::ABasicGameModeBase(): Super() {
 	DefaultPawnClass = ASpectator::StaticClass(); 
 	PlayerControllerClass = AMyPlayerController::StaticClass();
 
-	should_restart = false;
+	//should_restart = false;
 
 	/*
 	//Use blueprint Specrator
@@ -40,7 +42,7 @@ void ABasicGameModeBase::InitGame(const FString& MapName, const FString& Options
 }
 
 void ABasicGameModeBase::Tick(float dt) {
-	//UE_LOG(LogTemp, Warning, TEXT("Gameplay Tick"));
+	UE_LOG(LogTemp, Warning, TEXT("Gameplay Tick"));
 	//UE_LOG(LogTemp, Warning, TEXT("Tick"));
 
 	/*
@@ -103,9 +105,13 @@ void ABasicGameModeBase::restart_game() {
 	UE_LOG(LogTemp, Warning, TEXT("Reset"));
 	//RestartGame(); //Works, but not fully correctly
 
-	should_restart = true;
+	//should_restart = true;
 
 	EndMatch();
+
+	SetMatchState(MatchState::WaitingToStart);
+
+	UE_LOG(LogTemp, Warning, TEXT("End restart game"));
 	//StartMatch()
 
 	//ResetLevel();
@@ -155,16 +161,8 @@ void ABasicGameModeBase::HandleDisconnect
 
 /** Called when the state transitions to InProgress */
 void ABasicGameModeBase::HandleMatchHasStarted() {
-	UE_LOG(LogTemp, Warning, TEXT("HandleMatchHasStarted"));
 	Super::HandleMatchHasStarted();
-
-	UE_LOG(LogTemp, Warning, TEXT("BeginPlay"));
-
-	for (float i = -400; i < 600; i += 130) {
-		auto pos = FVector(800, i, 0);
-
-		AActor* my_actor = (AActor*)GetWorld()->SpawnActor(WeakEnemy, &pos);
-	}
+	on_start_match();
 }
 
 /** Called when the map transitions to WaitingPostMatch */
@@ -172,13 +170,8 @@ void ABasicGameModeBase::HandleMatchHasEnded() {
 	UE_LOG(LogTemp, Warning, TEXT("HandleMatchHasEnded"));
 	Super::HandleMatchHasEnded();
 
-	if (should_restart) {
-		ResetLevel();
-		UE_LOG(LogTemp, Warning, TEXT("TODO:How long reset?"));
-		SetMatchState(MatchState::WaitingToStart);
-		//StartMatch();
-		//StartPlay();
-	}
+	on_clear_match();
+	UE_LOG(LogTemp, Warning, TEXT("TODO:How long reset?"));
 }
 
 /** Called when the match transitions to LeavingMap */
@@ -197,11 +190,7 @@ void ABasicGameModeBase::HandleMatchIsWaitingToStart() {
 	UE_LOG(LogTemp, Warning, TEXT("HandleMatchIsWaitingToStart"));
 	Super::HandleMatchIsWaitingToStart();
 
-	if (should_restart) {
-		should_restart = false;
-		UE_LOG(LogTemp, Warning, TEXT("Start match!"));
-		StartMatch();
-	}
+	StartMatch();
 }
 
 /*
@@ -209,3 +198,29 @@ void ABasicGameModeBase::HandleStartingNewPlayer_Implementation(APlayerControlle
 
 }
 */
+
+OptionPtr<ABasicGameStateBase> ABasicGameModeBase::get_game_state() {
+	if (auto world = GetWorld()) {
+		return OptionPtr<ABasicGameStateBase>::new_unchecked(world->GetGameState<ABasicGameStateBase>());
+	}else {
+		return OptionPtr<ABasicGameStateBase>::new_none();
+	}
+}
+
+void ABasicGameModeBase::on_start_match() {
+	UE_LOG(LogTemp, Warning, TEXT("Start match"));
+
+	for (float i = -400; i < 600; i += 130) {
+		auto pos = FVector(800, i, 0);
+
+		AActor* my_actor = (AActor*)GetWorld()->SpawnActor(WeakEnemy, &pos);
+	}
+}
+
+void ABasicGameModeBase::on_clear_match() {
+	UE_LOG(LogTemp, Warning, TEXT("Clear match"));
+
+	ResetLevel();
+
+	UE_LOG(LogTemp, Warning, TEXT("End clear match"));
+}

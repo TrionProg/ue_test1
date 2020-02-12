@@ -49,6 +49,7 @@ ASpectator::ASpectator()
 // Called when the game starts or when spawned
 void ASpectator::BeginPlay()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Spec begin play"));
 	Super::BeginPlay();
 
 	ABasicGameModeBase * game_mode = Cast<ABasicGameModeBase>(GetWorld()->GetAuthGameMode());
@@ -61,7 +62,7 @@ void ASpectator::Tick(float dt)
 {
 	Super::Tick(dt);
 
-	UE_LOG(LogTemp, Warning, TEXT("Spec tick %f"), money);
+	//UE_LOG(LogTemp, Warning, TEXT("Spec tick %f"), money);
 
 	ABasicGameModeBase * game_mode = Cast<ABasicGameModeBase>(GetWorld()->GetAuthGameMode());
 	money += game_mode->get_money_increase() * dt;

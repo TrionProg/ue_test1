@@ -18,6 +18,8 @@ void AMyPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UE_LOG(LogTemp, Warning, TEXT("Player Controller begin play"));
+
 	/*
 
 	TArray<AActor*> found_actors;
@@ -69,6 +71,7 @@ void AMyPlayerController::PlayerTick(float dt) {
 	Super::PlayerTick(dt);
 
 	//Костыль
+	/*
 
 	if (get_spectator().is_none()) {
 		UE_LOG(LogTemp, Warning, TEXT("Kostil"));
@@ -86,6 +89,7 @@ void AMyPlayerController::PlayerTick(float dt) {
 			}
 		}
 	}
+	*/
 
 	//UE_LOG(LogTemp, Warning, TEXT("Pl Tick"));
 

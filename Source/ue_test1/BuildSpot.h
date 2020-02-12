@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Turret.h"
+#include "OptionPtr.h"
 
 #include "BuildSpot.generated.h"
 
@@ -29,7 +30,7 @@ class UE_TEST1_API ABuildSpot : public AActor
 	UPROPERTY(EditDefaultsOnly, Category = Turret)
 	TSubclassOf<class ATurret> Turret3;
 
-	ATurret *turret;
+	OptionPtr<ATurret> turret;
 public:
 	
 public:	
@@ -45,5 +46,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	bool build(uint8 turret_type);
+
+	void Reset();
 	
 };

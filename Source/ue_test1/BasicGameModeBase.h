@@ -7,7 +7,9 @@
 #include "GameFramework/GameMode.h"
 #include "Enemy.h"
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
-#include "Blueprint/UserWidget.h"
+//#include "Blueprint/UserWidget.h"
+#include "BasicGameStateBase.h"
+#include "OptionPtr.h"
 
 #include "BasicGameModeBase.generated.h"
 
@@ -37,7 +39,7 @@ protected:
 	//UFUNCTION(BlueprintImplementableEvent)
 	//void RestartGame();
 
-	bool should_restart;
+	//bool should_restart;
 
 protected:
 	/** Called when the game starts. */
@@ -86,4 +88,12 @@ public:
 	void HandleMatchIsWaitingToStart();
 
 	//void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer);
+
+	OptionPtr<ABasicGameStateBase> get_game_state();
+
+	//Вызывается при старте матча и устанавливает акторы, значения переменным
+	void on_start_match();
+
+	//Вызывается при очищении матча -- убирает мусор вроде трупов и разрушений
+	void on_clear_match();
 };
