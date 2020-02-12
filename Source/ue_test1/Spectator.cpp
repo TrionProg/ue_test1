@@ -10,8 +10,10 @@
 #include "BasicGameModeBase.h"
 
 
+//UE events and methods
+
 // Sets default values
-ASpectator::ASpectator()
+ASpectator::ASpectator() : Super()
 {
 	//Super::AActor();
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -51,43 +53,6 @@ void ASpectator::BeginPlay()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Spec begin play"));
 	Super::BeginPlay();
-
-	ABasicGameModeBase * game_mode = Cast<ABasicGameModeBase>(GetWorld()->GetAuthGameMode());
-	money = (float)game_mode->get_start_money();
-	current_turret_type = 1;
-}
-
-// Called every frame
-void ASpectator::Tick(float dt)
-{
-	Super::Tick(dt);
-
-	//UE_LOG(LogTemp, Warning, TEXT("Spec tick %f"), money);
-
-	ABasicGameModeBase * game_mode = Cast<ABasicGameModeBase>(GetWorld()->GetAuthGameMode());
-	money += game_mode->get_money_increase() * dt;
-
-	//ABasicGameModeBase * game_mode = Cast<ABasicGameModeBase>(GetWorld()->GetAuthGameMode());
-	//game_mode ->CurrentWidget->SetTex
-	
-	//game_mode->
-	//ABasicGameModeBase::CurrentWidget->
-
-	/*
-	if (CursorToWorld != nullptr)
-	{
-		if (APlayerController* PC = Cast<APlayerController>(GetController()))
-		{
-			FHitResult TraceHitResult;
-			PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
-			FVector CursorFV = TraceHitResult.ImpactNormal;
-			FRotator CursorR = CursorFV.Rotation();
-			CursorToWorld->SetWorldLocation(TraceHitResult.Location);
-			CursorToWorld->SetWorldRotation(CursorR);
-		}
-	}
-	*/
-
 }
 
 // Called to bind functionality to input
@@ -101,6 +66,31 @@ void ASpectator::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	//InputComponent->BindAxis("move right", this, &ASpectator::move_right);
 }
 
+// Called every frame
+void ASpectator::Tick(float dt)
+{
+	Super::Tick(dt);
+
+}
+
+void ASpectator::Reset() {
+	Super::Reset();
+	UE_LOG(LogTemp, Warning, TEXT("Reset Spec"));
+
+	//TODO maybe possess here?
+}
+
+void ASpectator::Restart() {
+	Super::Restart();
+	UE_LOG(LogTemp, Warning, TEXT("Restart Spec"));
+}
+
+void ASpectator::Destroyed(AActor* DestroyedActor) {
+	UE_LOG(LogTemp, Warning, TEXT("ASpectator Destroyed"));
+}
+
+//My methods
+
 void ASpectator::move_right(float value) {
 	FVector force_to_add = movement_force * value * FVector(0, 1, 0);
 	auto root = (USceneComponent*)RootComponent;
@@ -113,14 +103,7 @@ void ASpectator::move_up(float value) {
 	root->AddLocalOffset(force_to_add);
 }
 
-bool ASpectator::build() {
-	auto turret_type = current_turret_type;
-	auto turret_price = get_turret_price(turret_type);
-
-	if (money < turret_price) {
-		return false;
-	}
-
+bool ASpectator::build(int32 turret_type) {
 	if (APlayerController* PC = Cast<APlayerController>(GetController())) {
 		FHitResult TraceHitResult;
 		PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
@@ -138,72 +121,11 @@ bool ASpectator::build() {
 				auto dist = FVector::Dist2D(cursor_position, location);
 
 				if (dist <BUILDSPOT_CLICK_RADUS) {
-					if (build_spot->build(turret_type)) {
-						money -= turret_price;
-						return true;
-					}
-
-					return false;
+					return build_spot->build(turret_type);
 				}
 			}
 		}
 	}
 
 	return false;
-}
-
-int32 ASpectator::get_money() {
-	return (int32)money;
-}
-
-//TODO unreachable, exception, enum
-FString ASpectator::get_turret_name(uint8 turret_type) {
-	switch (turret_type) {
-	case 1:
-		return turret1_name;
-	case 2:
-		return turret2_name;
-	case 3:
-		return turret3_name;
-	}
-
-	return TEXT("No such turret");
-}
-
-//TODO unreachable, exception, enum
-int32 ASpectator::get_turret_price(uint8 turret_type) {
-	switch (turret_type) {
-	case 1:
-		return turret1_price;
-	case 2:
-		return turret2_price;
-	case 3:
-		return turret3_price;
-	}
-
-	return 0;
-}
-
-void ASpectator::set_current_turret_type(uint8 turret_type) {
-	current_turret_type = turret_type;
-}
-
-void ASpectator::give_money(int32 add_money) {
-	money += add_money;
-}
-
-void ASpectator::Reset() {
-	Super::Reset();
-	UE_LOG(LogTemp, Warning, TEXT("Reset Spec"));
-
-	//TODO maybe possess here?
-}
-
-void ASpectator::Restart() {
-	Super::Restart();
-	UE_LOG(LogTemp, Warning, TEXT("Restart Spec"));
-}
-
-void ASpectator::Destroyed(AActor* DestroyedActor) {
-	UE_LOG(LogTemp, Warning, TEXT("ASpectator Destroyed"));
 }

@@ -12,9 +12,10 @@
 #include "Turret.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
+//UE events and methods
 
 // Sets default values
-AEnemy::AEnemy()
+AEnemy::AEnemy() : Super()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -26,36 +27,6 @@ AEnemy::AEnemy()
 	sphere1 = CreateDefaultSubobject<UStaticMeshComponent>("Sphere 1");
 	sphere2 = CreateDefaultSubobject<UStaticMeshComponent>("Sphere 2");
 	sphere3 = CreateDefaultSubobject<UStaticMeshComponent>("Sphere 3");
-
-	/*
-	//WORKS
-	FName name2 = *FString::Printf(TEXT("Cude %i"), 2);
-	abc = CreateDefaultSubobject<UStaticMeshComponent>(name2);
-	*/
-
-	//Do not works?
-	//abc = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sphere 2"));
-
-	//WORKS
-	//abc = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Cude"));
-
-	/*
-	//WORKS
-	int32 amount = 3;
-
-	//RootComponent = CreateDefaultSubobject<USceneComponent>("SceneComponent");
-
-	for (int32 i = 0; i < amount; i++) {
-
-		FName name = *FString::Printf(TEXT("Sphere %i"), i);
-		UStaticMeshComponent* item = CreateDefaultSubobject<UStaticMeshComponent>(name);
-		item->AttachTo(this->RootComponent);
-
-		//abc = item;
-	}
-	*/
-
-	//sphere3 = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 
 	collision->SetupAttachment(RootComponent);
 	sphere1->SetupAttachment(RootComponent);
@@ -84,9 +55,9 @@ AEnemy::AEnemy()
 	sphere3->SetRelativeScale3D(FVector(0.45));
 	sphere3->SetGenerateOverlapEvents(false);
 
-	max_health = 100;
-	max_speed = 1;
-	speed_increase = 0.1;
+	MaxHealth = 100;
+	MaxSpeed = 1;
+	SpeedIncrease = 0.1;
 
 	this->OnTakeAnyDamage.AddDynamic(this, &AEnemy::TakeDamage);
 	this->OnDestroyed.AddDynamic(this, &AEnemy::Destroyed);
@@ -97,8 +68,8 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	 
-	health = max_health;
-	speed = max_speed;
+	health = MaxHealth;
+	speed = MaxSpeed;
 }
 
 // Called every frame
@@ -106,52 +77,17 @@ void AEnemy::Tick(float dt)
 {
 	Super::Tick(dt);
 
-	if (speed < max_speed) {
-		speed += speed_increase * dt;
+	if (speed < MaxSpeed) {
+		speed += SpeedIncrease * dt;
 
-		if (speed > max_speed) {
-			speed = max_speed;
+		if (speed > MaxSpeed) {
+			speed = MaxSpeed;
 		}
-	}
-}
-
-int32 AEnemy::get_reward() {
-	return reward;
-}
-
-void AEnemy::SlowDown(float dmg) {
-	UE_LOG(LogTemp, Warning, TEXT("Slow"));
-	if (speed < dmg) {
-		speed = 0;
-	}
-	else {
-		speed -= dmg;
-	}
-}
-
-void AEnemy::TakeDamage(AActor* DamagedActor, float damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser) {
-	if (health <= damage) {
-		health = 0;
-
-		if (InstigatedBy) {
-			auto controller = Cast<AMyPlayerController>(InstigatedBy);
-
-			if (controller) {
-				if (auto spectator = controller->get_spectator().match()) {
-					auto reward = get_reward();
-					spectator->give_money(reward);
-				}
-			}
-		}
-
-		Destroy();
-	}else {
-		health -= damage;
 	}
 }
 
 void AEnemy::Destroyed(AActor* DestroyedActor) {
-	UE_LOG(LogTemp, Warning, TEXT("Destroyed"));
+	UE_LOG(LogTemp, Warning, TEXT("Destroyed Enemy"));
 
 	auto world = GetWorld();
 
@@ -168,6 +104,44 @@ void AEnemy::Destroyed(AActor* DestroyedActor) {
 				turret->on_enemy_died(this);
 			}
 		}
+	}
+}
+
+void AEnemy::Reset() {
+	UE_LOG(LogTemp, Warning, TEXT("Reset Enemy"));
+	Super::Reset();
+}
+
+//My methods
+
+int32 AEnemy::get_reward() {
+	return Reward;
+}
+
+void AEnemy::slow_down(float dmg) {
+	if (speed < dmg) {
+		speed = 0;
+	}
+	else {
+		speed -= dmg;
+	}
+}
+
+void AEnemy::TakeDamage(AActor* DamagedActor, float damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser) {
+	if (health <= damage) {
+		health = 0;
+
+		if (InstigatedBy) {
+			auto controller = Cast<AMyPlayerController>(InstigatedBy);
+
+			if (controller) {
+				controller->give_money(Reward);
+			}
+		}
+
+		Destroy();
+	}else {
+		health -= damage;
 	}
 }
 

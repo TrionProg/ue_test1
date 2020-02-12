@@ -6,8 +6,9 @@
 #include "Spectator.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
+//UE events and methods
 
-AMyPlayerController::AMyPlayerController() {
+AMyPlayerController::AMyPlayerController() : Super() {
 	bShowMouseCursor = true;
 	paused = false;
 	//DefaultMouseCursor = EMouseCursor::Crosshairs;
@@ -20,28 +21,9 @@ void AMyPlayerController::BeginPlay()
 
 	UE_LOG(LogTemp, Warning, TEXT("Player Controller begin play"));
 
-	/*
-
-	TArray<AActor*> found_actors;
-
-	UGameplayStatics::GetAllActorsOfClass((UObject*)GetWorld(), ASpectator::StaticClass(), found_actors);
-
-	UE_LOG(LogTemp, Warning, TEXT("Controller beg play"));
-
-	for (AActor* abstract_actor : found_actors) {
-		ASpectator* spec = Cast<ASpectator>(abstract_actor);
-
-		if (spec) {
-			UE_LOG(LogTemp, Warning, TEXT("Spec!!!!"));
-			Possess(spec);
-		}
-	}
-	*/
-
 	SetInputMode(FInputModeGameAndUI());
 
-	//TODO IsLocalController(). and move to controller
-	ChangeMenuWidget(StartingWidgetClass);
+	change_menu_widget(StartingWidgetClass);
 	select_turret_type(1);
 }
 
@@ -53,7 +35,6 @@ void AMyPlayerController::SetupInputComponent() {
 	InputComponent->BindAxis("move up", this, &AMyPlayerController::move_up);
 	InputComponent->BindAxis("move right", this, &AMyPlayerController::move_right);
 
-	InputComponent->BindAction("LMBClick", IE_Pressed, this, &AMyPlayerController::on_lmb_press);
 	InputComponent->BindAction("LMBClick", IE_Released, this, &AMyPlayerController::on_lmb_release);
 
 	InputComponent->BindAction("Turret1", IE_Released, this, &AMyPlayerController::on_key1_release);
@@ -70,57 +51,61 @@ void AMyPlayerController::SetupInputComponent() {
 void AMyPlayerController::PlayerTick(float dt) {
 	Super::PlayerTick(dt);
 
-	//Костыль
-	/*
-
-	if (get_spectator().is_none()) {
-		UE_LOG(LogTemp, Warning, TEXT("Kostil"));
-		TArray<AActor*> found_actors;
-
-		UGameplayStatics::GetAllActorsOfClass((UObject*)GetWorld(), ASpectator::StaticClass(), found_actors);
-
-		for (AActor* abstract_actor : found_actors) {
-			UE_LOG(LogTemp, Warning, TEXT("ggg"));
-			ASpectator* spec = Cast<ASpectator>(abstract_actor);
-
-			if (spec) {
-				UE_LOG(LogTemp, Warning, TEXT("Spec!!!!"));
-				Possess(spec);
-			}
-		}
-	}
-	*/
-
-	//UE_LOG(LogTemp, Warning, TEXT("Pl Tick"));
-
 	draw_money();
 }
 
-void AMyPlayerController::move_right(float value) {
-	if (auto spectator = get_spectator().match()) {
-		spectator->move_right(value);
+void AMyPlayerController::Reset() {
+	Super::Reset();
+	UE_LOG(LogTemp, Warning, TEXT("Reset Controller"));
+}
+
+void AMyPlayerController::BeginPlayingState() {
+	UE_LOG(LogTemp, Warning, TEXT("BeginPlayingState"));
+	Super::BeginPlayingState();
+
+	if (!IsLocalController()) {
+		UE_LOG(LogTemp, Warning, TEXT("NotLocal"));
+	}else {
+		UE_LOG(LogTemp, Warning, TEXT("IsLocal"));
 	}
 }
 
-void AMyPlayerController::move_up(float value) {
-	if (auto spectator = get_spectator().match()) {
-		spectator->move_up(value);
+void AMyPlayerController::EndPlayingState() {
+	UE_LOG(LogTemp, Warning, TEXT("EndPlayingState"));
+	Super::EndPlayingState();
+}
+
+//My methods
+
+OptionPtr<UWorld> AMyPlayerController::get_world() {
+	return OptionPtr<UWorld>::new_unchecked(GetWorld());
+}
+
+OptionPtr<ASpectator> AMyPlayerController::get_spectator() {
+	auto pawn = GetPawn();
+	auto spectator = (ASpectator*)pawn;
+
+	return OptionPtr<ASpectator>::new_unchecked(spectator);
+}
+
+OptionPtr<AMyPlayerState> AMyPlayerController::get_player_state() {
+	return OptionPtr<AMyPlayerState>::new_unchecked((AMyPlayerState*)PlayerState);
+}
+
+OptionPtr<ABasicGameModeBase> AMyPlayerController::get_game_mode() {
+	if (auto world = get_world().match()) {
+		auto abstract_game_mode = world->GetAuthGameMode();
+		if (abstract_game_mode) {
+			ABasicGameModeBase* game_mode = Cast<ABasicGameModeBase>(abstract_game_mode);
+
+			return OptionPtr<ABasicGameModeBase>::new_unchecked(game_mode);
+		}
 	}
+
+	return OptionPtr<ABasicGameModeBase>::new_none();
 }
 
-void AMyPlayerController::on_lmb_press() {
-	UE_LOG(LogTemp, Warning, TEXT("Press"));
-}
-
-void AMyPlayerController::on_lmb_release() {
-	UE_LOG(LogTemp, Warning, TEXT("Click"));
-
-	if (auto spectator = get_spectator().match()) {
-		spectator->build();
-	}
-}
-
-void AMyPlayerController::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)
+void AMyPlayerController::change_menu_widget(TSubclassOf<UUserWidget> NewWidgetClass)
 {
 	if (!IsLocalController()) {
 		return;
@@ -141,25 +126,20 @@ void AMyPlayerController::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetCla
 	}
 }
 
-OptionPtr<ASpectator> AMyPlayerController::get_spectator() { //TODO On reset may be nullptr
-	auto pawn = GetPawn();
-	auto spectator = (ASpectator*)pawn;
-
-	return OptionPtr<ASpectator>::new_unchecked(spectator);
+void AMyPlayerController::move_right(float value) {
+	if (auto spectator = get_spectator().match()) {
+		spectator->move_right(value);
+	}
 }
 
-void AMyPlayerController::draw_money() {
-	if (CurrentWidget == nullptr) {
-		return;
-	}
-
+void AMyPlayerController::move_up(float value) {
 	if (auto spectator = get_spectator().match()) {
-		auto money = spectator->get_money();
-
-		auto hud = (UMyHUD*)CurrentWidget;
-
-		hud->SetMoney(money);
+		spectator->move_up(value);
 	}
+}
+
+void AMyPlayerController::on_lmb_release() {
+	build();
 }
 
 void AMyPlayerController::on_key1_release() {
@@ -172,23 +152,6 @@ void AMyPlayerController::on_key2_release() {
 
 void AMyPlayerController::on_key3_release() {
 	select_turret_type(3);
-}
-
-void AMyPlayerController::select_turret_type(uint8 turret_type) {
-	if (auto spectator = get_spectator().match()) {
-		auto turret_name = spectator->get_turret_name(turret_type);
-		auto turret_price = spectator->get_turret_price(turret_type);
-
-		spectator->set_current_turret_type(turret_type);
-
-		if (!IsLocalController()) {
-			return;
-		}
-
-		auto hud = (UMyHUD*)CurrentWidget;
-
-		hud->SetCurrentTurret(turret_name, turret_price);
-	}
 }
 
 void AMyPlayerController::on_key_space_release() {
@@ -206,35 +169,76 @@ void AMyPlayerController::pause() {
 }
 
 void AMyPlayerController::restart_game() {
-	UE_LOG(LogTemp, Warning, TEXT("Restart"));
 	ABasicGameModeBase * game_mode = Cast<ABasicGameModeBase>(GetWorld()->GetAuthGameMode());
 
 	if (game_mode) {
 		game_mode->restart_game();
 	}
-	//game_mode->ResetLevel();
 }
 
-/** Reset actor to initial state - used when restarting level without reloading. */
-void AMyPlayerController::Reset() {
-	Super::Reset();
-	UE_LOG(LogTemp, Warning, TEXT("Reset Controller"));
+void AMyPlayerController::draw_money() {
+	if (!IsLocalController()) {
+		return;
+	}
 
-	/*
-	//Костыль не работает т.к. далее резет спектатора.
+	if (CurrentWidget == nullptr) {
+		return;
+	}
 
-	TArray<AActor*> found_actors;
+	if (auto player_state = get_player_state().match()) {
+		auto money = player_state->money;
 
-	UGameplayStatics::GetAllActorsOfClass((UObject*)GetWorld(), ASpectator::StaticClass(), found_actors);
+		auto hud = (UMyHUD*)CurrentWidget;
 
-	for (AActor* abstract_actor : found_actors) {
-		ASpectator* spec = Cast<ASpectator>(abstract_actor);
+		hud->SetMoney(money);
+	}
+}
 
-		if (spec) {
-			//UE_LOG(LogTemp, Warning, TEXT("Spec!!!!"));
-			Possess(spec);
-			return;
+void AMyPlayerController::select_turret_type(uint8 turret_type) {
+	if (auto player_state = get_player_state().match()) {
+		if (auto game_mode = get_game_mode().match()) {
+			player_state->current_turret_type = turret_type;
+			auto turret_name = game_mode->get_turret_name(turret_type);
+			auto turret_price = game_mode->get_turret_price(turret_type);
+
+			if (IsLocalController()) {
+				auto hud = (UMyHUD*)CurrentWidget;
+
+				hud->SetCurrentTurret(turret_name, turret_price);
+			}
 		}
 	}
-	*/
+}
+
+void AMyPlayerController::build() {
+	if (auto spectator = get_spectator().match()) {
+		if (auto game_mode = get_game_mode().match()) {
+			if (auto player_state = get_player_state().match()) {
+				auto turret_type = player_state->current_turret_type;
+				auto turret_name = game_mode->get_turret_name(turret_type);
+				auto turret_price = game_mode->get_turret_price(turret_type);
+
+				if (player_state->money < turret_price) {
+					return;
+				}
+
+				if (spectator->build(turret_type)) {
+					player_state->money -= turret_price;
+				}
+			}
+		}
+
+	}
+}
+
+void AMyPlayerController::set_money(float money) {
+	if (auto player_state = get_player_state().match()) {
+		player_state->money = money;
+	}
+}
+
+void AMyPlayerController::give_money(float money) {
+	if (auto player_state = get_player_state().match()) {
+		player_state->money += money;
+	}
 }

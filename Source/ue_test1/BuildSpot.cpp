@@ -8,7 +8,7 @@
 
 
 // Sets default values
-ABuildSpot::ABuildSpot()
+ABuildSpot::ABuildSpot() : Super()
 {
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 
@@ -44,6 +44,8 @@ void ABuildSpot::Tick(float DeltaTime)
 
 void ABuildSpot::Reset()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Reset ABuildSpot"));
+	Super::Reset();
 	turret = OptionPtr<ATurret>::new_none();
 }
 
