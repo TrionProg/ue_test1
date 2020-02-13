@@ -10,6 +10,7 @@
 //#include "Blueprint/UserWidget.h"
 #include "BasicGameStateBase.h"
 #include "OptionPtr.h"
+#include "DifficultyLevel.h"
 
 #include "BasicGameModeBase.generated.h"
 
@@ -37,6 +38,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GameplayConfig)
 	int32 MoneyIncrease;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GameplayConfig)
+	int32 StartHealth;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Turret)
 	FString turret1_name;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Turret)
@@ -50,6 +54,9 @@ public:
 	int32 turret2_price;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Turret)
 	int32 turret3_price;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GameplayConfig)
+	TArray<TSubclassOf<class UDifficultyLevel>> Levels;
 
 //UE events and methods
 protected:
@@ -76,10 +83,20 @@ protected:
 public:
 	ABasicGameModeBase();
 //My variables
+private:
+	int32 current_level;
+	float spawn_weak_enemy_freq;
+	float spawn_medium_enemy_freq;
+	float spawn_strong_enemy_freq;
+	float level_time;
+	float pre_spawn_counter;
+	float spawn_delay;
 //My methods
 private:
 	OptionPtr<UWorld> get_world();
 	OptionPtr<ABasicGameStateBase> get_game_state();
+
+	void try_spawn_enemy(UWorld& world, TSubclassOf<class AEnemy>& enemy, float freq);
 public:
 	UFUNCTION(BlueprintCallable, Category = "Money")
 	void restart_game();
@@ -89,6 +106,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Turret")
 	int32 get_turret_price(uint8 turret_type);
+
+	void set_difficulty_level(int32 level);
+
+	FString create_difficulty_level_name();
 //My Events
 public:
 	//Вызывается до старта матча и устанавливает акторы, значения переменным
@@ -102,4 +123,6 @@ public:
 
 	//Вызывается каждый тик
 	void on_tick(float dt);
+
+	void on_spawn_enemies(UWorld& world);
 };

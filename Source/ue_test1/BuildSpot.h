@@ -16,7 +16,7 @@ UCLASS()
 class UE_TEST1_API ABuildSpot : public AActor
 {
 	GENERATED_BODY()
-	
+//UE variables
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UDecalComponent* decal;
 
@@ -29,24 +29,23 @@ class UE_TEST1_API ABuildSpot : public AActor
 
 	UPROPERTY(EditDefaultsOnly, Category = Turret)
 	TSubclassOf<class ATurret> Turret3;
-
-	OptionPtr<ATurret> turret;
 public:
-	
+//UE events and methods
+protected:
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+	virtual void Reset() override;
 public:	
 	// Sets default values for this actor's properties
 	ABuildSpot();
+//My variables
+private:
+	OptionPtr<ATurret> turret;
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
+//My methods
+private:
+	OptionPtr<UWorld> get_world();
+	bool spawn_turret(UWorld& world, TSubclassOf<class ATurret>& turret, FVector& pos);
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	bool build(uint8 turret_type);
-
-	void Reset();
-	
 };

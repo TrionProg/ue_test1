@@ -13,8 +13,9 @@ UCLASS()
 class UE_TEST1_API ABasicGameStateBase : public AGameState
 {
 	GENERATED_BODY()
-	
-	
+public:
+	//UPROPERTY() //TODO Replication
+	//float level_time;
 	
 	
 };

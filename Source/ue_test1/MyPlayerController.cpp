@@ -11,6 +11,8 @@
 AMyPlayerController::AMyPlayerController() : Super() {
 	bShowMouseCursor = true;
 	paused = false;
+
+	UE_LOG(LogTemp, Warning, TEXT("Player Controller Constructor"));
 	//DefaultMouseCursor = EMouseCursor::Crosshairs;
 
 }
@@ -23,8 +25,7 @@ void AMyPlayerController::BeginPlay()
 
 	SetInputMode(FInputModeGameAndUI());
 
-	change_menu_widget(StartingWidgetClass);
-	select_turret_type(1);
+
 }
 
 
@@ -51,7 +52,9 @@ void AMyPlayerController::SetupInputComponent() {
 void AMyPlayerController::PlayerTick(float dt) {
 	Super::PlayerTick(dt);
 
-	draw_money();
+	on_tick(dt);
+
+	draw_hud();
 }
 
 void AMyPlayerController::Reset() {
@@ -176,7 +179,7 @@ void AMyPlayerController::restart_game() {
 	}
 }
 
-void AMyPlayerController::draw_money() {
+void AMyPlayerController::draw_hud() {
 	if (!IsLocalController()) {
 		return;
 	}
@@ -186,11 +189,10 @@ void AMyPlayerController::draw_money() {
 	}
 
 	if (auto player_state = get_player_state().match()) {
-		auto money = player_state->money;
-
 		auto hud = (UMyHUD*)CurrentWidget;
 
-		hud->SetMoney(money);
+		hud->SetMoney(player_state->money);
+		hud->SetDifficultyLevelTime(player_state->level_time); //TODO or get level_time from GameState?
 	}
 }
 
@@ -240,5 +242,62 @@ void AMyPlayerController::set_money(float money) {
 void AMyPlayerController::give_money(float money) {
 	if (auto player_state = get_player_state().match()) {
 		player_state->money += money;
+	}
+}
+
+void AMyPlayerController::set_difficulty_level(FString name) {
+	if (IsLocalController() && CurrentWidget) {
+		auto hud = (UMyHUD*)CurrentWidget;
+
+		hud->SetCurrentDifficultyLevel(name);
+	}
+}
+
+void AMyPlayerController::set_difficulty_level_time(int32 time) {
+	if (auto player_state = get_player_state().match()) {
+		player_state->level_time = time;
+	}
+}
+
+void AMyPlayerController::set_health(int32 health) {
+	SetInputMode(FInputModeGameAndUI());//TODO tmp
+
+	if (auto player_state = get_player_state().match()) {
+		player_state->health = health;
+
+		if (IsLocalController() && CurrentWidget) {//TODO CurrentWidget may be nullptr!
+			auto hud = (UMyHUD*)CurrentWidget;
+
+			hud->SetPlayerHealth(health);
+		}
+	}
+}
+
+bool AMyPlayerController::decrement_health() {
+	if (auto player_state = get_player_state().match()) {
+		player_state->health--;
+
+		if (IsLocalController()) {
+			auto hud = (UMyHUD*)CurrentWidget;
+
+			hud->SetPlayerHealth(player_state->health);
+		}
+
+		return player_state->health == 0;
+	}
+
+	return false;
+}
+
+void AMyPlayerController::on_before_match() {
+	if (!CurrentWidget) {
+		change_menu_widget(StartingWidgetClass);
+		select_turret_type(1);
+	}
+}
+
+void AMyPlayerController::on_tick(float dt) {
+	if (auto player_state = get_player_state().match()) {
+		player_state->level_time -= dt;
 	}
 }

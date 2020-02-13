@@ -24,6 +24,12 @@ friend class AMyPlayerController;
 
 	UPROPERTY() //TODO Replication
 	uint8 current_turret_type;
+
+	UPROPERTY() //TODO Replication
+	int32 health;
+
+	UPROPERTY() //TODO Replication
+	float level_time;
 	
 	
 };

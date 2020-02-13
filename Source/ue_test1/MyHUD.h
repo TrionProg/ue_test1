@@ -21,5 +21,13 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetCurrentTurret(const FString& type, int32 price);
-	
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetCurrentDifficultyLevel(const FString& level_name);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetDifficultyLevelTime(const int32 time);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetPlayerHealth(const int32 health);
 };

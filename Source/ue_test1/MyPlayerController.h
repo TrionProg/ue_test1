@@ -68,7 +68,7 @@ private:
 	void pause();
 	void restart_game();
 
-	void draw_money();
+	void draw_hud();
 
 	void select_turret_type(uint8 turret_type);
 
@@ -82,4 +82,13 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Money")
 	void give_money(float money);
+
+	void set_difficulty_level(FString name);
+	void set_difficulty_level_time(int32 time);
+
+	void set_health(int32 health);
+	bool decrement_health();
+
+	void on_before_match();
+	void on_tick(float dt);
 };

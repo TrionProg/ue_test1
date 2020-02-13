@@ -9,6 +9,7 @@
 #include "BasicGameStateBase.h"
 #include "Runtime/Engine/Classes/Engine/World.h"
 #include "MyPlayerController.h"
+#include "Math/UnrealMathUtility.h"
 
 //UE events and methods
 
@@ -65,7 +66,6 @@ void ABasicGameModeBase::Logout(AController* Exiting) {
 }
 
 void ABasicGameModeBase::Tick(float dt) {
-	UE_LOG(LogTemp, Warning, TEXT("Gameplay Tick"));
 	Super::Tick(dt);
 	on_tick(dt);
 }
@@ -158,6 +158,56 @@ int32 ABasicGameModeBase::get_turret_price(uint8 turret_type) {
 	return 0;
 }
 
+void ABasicGameModeBase::set_difficulty_level(int32 next_level) {
+	if (Levels.Num() == 0) {
+		UE_LOG(LogTemp, Warning, TEXT("No Difficulty Levels"));
+		return;
+	}
+
+	if (!Levels.IsValidIndex(next_level)) {
+		next_level = Levels.Num() - 1;
+	}
+
+	current_level = next_level;
+
+	TSubclassOf<class UDifficultyLevel>& lvl = Levels[current_level];
+	auto level = lvl.GetDefaultObject();
+
+	spawn_weak_enemy_freq = level->WeakEnemySpawnFrequency;
+	spawn_medium_enemy_freq = level->MediumEnemySpawnFrequency;
+	spawn_strong_enemy_freq = level->StrongEnemySpawnFrequency;
+	level_time = level->LevelTime;;
+	pre_spawn_counter = 0;
+	spawn_delay = level->SpawnDelay;
+
+	if (auto world = get_world().match()) {
+		auto level_name = create_difficulty_level_name();
+
+		for (FConstPlayerControllerIterator iter = world->GetPlayerControllerIterator(); iter; ++iter) {
+			auto player_controller = (AMyPlayerController*)iter->Get(); //TODO safe cast
+
+			if (player_controller) {
+				player_controller->set_difficulty_level(level_name);
+				player_controller->set_difficulty_level_time(level_time);
+			}
+		}
+	}
+}
+
+FString ABasicGameModeBase::create_difficulty_level_name() {
+	TSubclassOf<class UDifficultyLevel>& lvl = Levels[current_level];
+	auto level = lvl.GetDefaultObject();
+
+	//UE_LOG(LogTemp, Warning, TEXT("Level: %d %s"), current_level, level->Name);
+
+	FString lvlname = level->Name;
+	UE_LOG(LogTemp, Warning, TEXT("Level: %d %s"), current_level, *lvlname);
+
+	auto level_name = FString::Printf(TEXT("#%d %s"), current_level, *lvlname);
+
+	return level_name;
+}
+
 //My Events
 
 void ABasicGameModeBase::on_before_match() {
@@ -168,17 +218,24 @@ void ABasicGameModeBase::on_before_match() {
 			auto player_controller = (AMyPlayerController*)iter->Get(); //TODO safe cast
 			
 			if (player_controller) {
-				UE_LOG(LogTemp, Warning, TEXT("SET MONEY!"));
+				player_controller->on_before_match();
+				player_controller->set_health(StartHealth);
 				player_controller->set_money(StartMoney);
 			}
 		}
 
+		/*
 		for (float i = -400; i < 600; i += 130) {
 			auto pos = FVector(800, i, 0);
 
 			AActor* my_actor = (AActor*)world->SpawnActor(WeakEnemy, &pos);
 		}
+		*/
 	}
+
+	set_difficulty_level(0);
+
+	current_level = 0;
 }
 
 void ABasicGameModeBase::on_start_match() {
@@ -204,5 +261,40 @@ void ABasicGameModeBase::on_tick(float dt) {
 				player_controller->give_money(money_increase);
 			}
 		}
+	}
+
+	level_time -= dt;
+
+	if (level_time < 0.0) {
+		current_level += 1;
+
+		//Will be limited automatically
+		set_difficulty_level(current_level);
+	}
+
+	pre_spawn_counter += dt;
+
+	if (pre_spawn_counter >= spawn_delay) {
+		pre_spawn_counter = 0.0;
+
+		if (auto world = get_world().match()) {
+			on_spawn_enemies(*world);
+		}
+	}
+}
+
+void ABasicGameModeBase::on_spawn_enemies(UWorld& world) {
+	try_spawn_enemy(world, WeakEnemy, spawn_weak_enemy_freq);
+	try_spawn_enemy(world, MediumEnemy, spawn_medium_enemy_freq);
+	try_spawn_enemy(world, StrongEnemy, spawn_strong_enemy_freq);
+}
+
+void ABasicGameModeBase::try_spawn_enemy(UWorld& world, TSubclassOf<class AEnemy>& enemy, float freq) {
+	if (FMath::RandRange(0.0f, 1.0f) < freq) {
+		auto y_position = FMath::RandRange(-620.0f, 620.0f);
+
+		auto pos = FVector(800, y_position, 0);
+
+		AActor* my_actor = (AActor*)world.SpawnActor(enemy, &pos);
 	}
 }

@@ -6,7 +6,7 @@
 #include "Materials/Material.h"
 #include "Runtime/Engine/Classes/Engine/World.h"
 
-
+//UE events and methods
 // Sets default values
 ABuildSpot::ABuildSpot() : Super()
 {
@@ -28,14 +28,12 @@ ABuildSpot::ABuildSpot() : Super()
 	turret = OptionPtr<ATurret>::new_none();
 }
 
-// Called when the game starts or when spawned
 void ABuildSpot::BeginPlay()
 {
 	Super::BeginPlay();
 	turret = OptionPtr<ATurret>::new_none();
 }
 
-// Called every frame
 void ABuildSpot::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -49,6 +47,8 @@ void ABuildSpot::Reset()
 	turret = OptionPtr<ATurret>::new_none();
 }
 
+//My methods
+
 bool ABuildSpot::build(uint8 turret_type) {
 	if (auto existing_turret = turret.match()) {
 		//Строим лишь то, что круче
@@ -60,6 +60,8 @@ bool ABuildSpot::build(uint8 turret_type) {
 		}
 	}
 
+	//TODO сначала попробуем создать, а лишь затем удаляем
+
 	if (auto world = GetWorld()) {
 		auto pos = GetActorLocation();
 
@@ -67,23 +69,39 @@ bool ABuildSpot::build(uint8 turret_type) {
 		case 1:
 			if (!Turret1) return false;//TODO assert?
 
-			turret.set((ATurret*)world->SpawnActor(Turret1, &pos));
+			return spawn_turret(*world, Turret1, pos);
+
 			break;
 		case 2:
 			if (!Turret2) return false;//TODO assert?
 
-			turret.set((ATurret*)world->SpawnActor(Turret2, &pos));
+			return spawn_turret(*world, Turret2, pos);
+
 			break;
 		case 3:
 			if (!Turret3) return false;//TODO assert?
 
-			turret.set((ATurret*)world->SpawnActor(Turret3, &pos));
+			return spawn_turret(*world, Turret3, pos);
+
 			break;
 		}
-
-		return true;
-	}else {
-		return false;
 	}
+
+	return false;
 }
 
+OptionPtr<UWorld> ABuildSpot::get_world() {
+	return OptionPtr<UWorld>::new_unchecked(GetWorld());
+}
+
+bool ABuildSpot::spawn_turret(UWorld& world, TSubclassOf<class ATurret>& new_turret, FVector& pos) {
+	auto spawned_turret = world.SpawnActor(new_turret, &pos);
+
+	if (spawned_turret) {
+		turret.set((ATurret*)spawned_turret);
+
+		return true;
+	}
+
+	return false;
+}
