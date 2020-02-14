@@ -219,6 +219,10 @@ void ABasicGameModeBase::on_before_match() {
 			
 			if (player_controller) {
 				player_controller->on_before_match();
+				if (!player_controller) {
+					UE_LOG(LogTemp, Warning, TEXT("AAA"));
+					return;
+				}
 				player_controller->set_health(StartHealth);
 				player_controller->set_money(StartMoney);
 			}

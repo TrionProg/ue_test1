@@ -11,6 +11,7 @@
 AMyPlayerController::AMyPlayerController() : Super() {
 	bShowMouseCursor = true;
 	paused = false;
+	CurrentWidget = nullptr;
 
 	UE_LOG(LogTemp, Warning, TEXT("Player Controller Constructor"));
 	//DefaultMouseCursor = EMouseCursor::Crosshairs;
@@ -203,7 +204,7 @@ void AMyPlayerController::select_turret_type(uint8 turret_type) {
 			auto turret_name = game_mode->get_turret_name(turret_type);
 			auto turret_price = game_mode->get_turret_price(turret_type);
 
-			if (IsLocalController()) {
+			if (IsLocalController() && CurrentWidget) {
 				auto hud = (UMyHUD*)CurrentWidget;
 
 				hud->SetCurrentTurret(turret_name, turret_price);
@@ -260,8 +261,6 @@ void AMyPlayerController::set_difficulty_level_time(int32 time) {
 }
 
 void AMyPlayerController::set_health(int32 health) {
-	SetInputMode(FInputModeGameAndUI());//TODO tmp
-
 	if (auto player_state = get_player_state().match()) {
 		player_state->health = health;
 
