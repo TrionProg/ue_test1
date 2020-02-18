@@ -6,16 +6,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "GameFramework/Character.h"
+#include "MyPawnMovementComponent.h"
 #include "Enemy.generated.h"
 
 UCLASS()
-class UE_TEST1_API AEnemy : public APawn
+class UE_TEST1_API AEnemy : public ACharacter//APawn
 {
 	GENERATED_BODY()
 //UE variables
 protected:
-	UPROPERTY(EditAnyWhere)
-	UShapeComponent* collision;
+	//UPROPERTY(EditAnyWhere)
+	//UShapeComponent* collision;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* sphere1;
@@ -25,6 +27,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* sphere3;
+
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	//UMyPawnMovementComponent* movement_component;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	float MaxSpeed;

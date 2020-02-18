@@ -8,6 +8,7 @@
 
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "Runtime/Engine/Classes/Components/BoxComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "MyPlayerController.h"
 #include "Turret.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
@@ -20,15 +21,16 @@ AEnemy::AEnemy() : Super()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	//RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 
-	collision = CreateDefaultSubobject<UBoxComponent>(TEXT("Root"));
+	//collision = CreateDefaultSubobject<UBoxComponent>(TEXT("Root"));
+	//RootComponent = collision;
 
 	sphere1 = CreateDefaultSubobject<UStaticMeshComponent>("Sphere 1");
 	sphere2 = CreateDefaultSubobject<UStaticMeshComponent>("Sphere 2");
 	sphere3 = CreateDefaultSubobject<UStaticMeshComponent>("Sphere 3");
 
-	collision->SetupAttachment(RootComponent);
+	//collision->SetupAttachment(RootComponent);
 	sphere1->SetupAttachment(RootComponent);
 	sphere2->SetupAttachment(RootComponent);
 	sphere3->SetupAttachment(RootComponent);
@@ -39,10 +41,11 @@ AEnemy::AEnemy() : Super()
 	sphere2->SetStaticMesh(MeshToUse.Object);
 	sphere3->SetStaticMesh(MeshToUse.Object);
 
-	collision->SetWorldLocation(FVector(0.0, 0.0, 110.0));
-	collision->SetWorldScale3D(FVector(1,1,3.2));
-	collision->SetGenerateOverlapEvents(true);
-	collision->SetCollisionProfileName(TEXT("BlockAll"));
+	//collision->SetWorldLocation(FVector(0.0, 0.0, 110.0));
+	//collision->SetWorldScale3D(FVector(1,1,3.2));
+	//collision->SetGenerateOverlapEvents(true);
+	//collision->SetCollisionProfileName(TEXT("Pawn"));
+	//collision->bAutoActivate = true; //Activated by default?
 
 	sphere1->SetWorldLocation(FVector(0.0, 0.0, 0.0));
 	sphere1->SetGenerateOverlapEvents(false);
@@ -51,9 +54,15 @@ AEnemy::AEnemy() : Super()
 	sphere2->SetWorldScale3D(FVector(0.75));
 	sphere2->SetGenerateOverlapEvents(false);
 
-	sphere3->SetRelativeLocation(FVector(0.0, 0.0, 160.0));
-	sphere3->SetRelativeScale3D(FVector(0.45));
+	sphere3->SetWorldLocation(FVector(0.0, 0.0, 160.0));
+	sphere3->SetWorldScale3D(FVector(0.45));
 	sphere3->SetGenerateOverlapEvents(false);
+
+	/*
+	movement_component = CreateDefaultSubobject<UMyPawnMovementComponent>(TEXT("MyMovementComponent"));
+	movement_component->UpdatedComponent = RootComponent;
+	*/
+	//movement_component->bAutoActivate = false; //Activated by default?
 
 	MaxHealth = 100;
 	MaxSpeed = 1;
@@ -70,6 +79,7 @@ void AEnemy::BeginPlay()
 	 
 	health = MaxHealth;
 	speed = MaxSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = speed;
 }
 
 // Called every frame
@@ -83,7 +93,13 @@ void AEnemy::Tick(float dt)
 		if (speed > MaxSpeed) {
 			speed = MaxSpeed;
 		}
+
+		GetCharacterMovement()->MaxWalkSpeed = speed;
 	}
+	
+	//movement_component->SetInputVector(GetActorForwardVector());
+	//AddMovementInput(GetActorForwardVector());
+	//movement_component->Velocity = FVector(300.0, 300.0, 0.0);
 }
 
 void AEnemy::Destroyed(AActor* DestroyedActor) {
@@ -121,10 +137,11 @@ int32 AEnemy::get_reward() {
 void AEnemy::slow_down(float dmg) {
 	if (speed < dmg) {
 		speed = 0;
-	}
-	else {
+	}else {
 		speed -= dmg;
 	}
+
+	GetCharacterMovement()->MaxWalkSpeed = speed;
 }
 
 void AEnemy::TakeDamage(AActor* DamagedActor, float damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser) {
