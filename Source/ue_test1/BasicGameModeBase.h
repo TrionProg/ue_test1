@@ -41,6 +41,21 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GameplayConfig)
 	int32 StartHealth;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GameplayConfig)
+	int32 LosePosition;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SpawnEnemy)
+	float SpawnEnemyX;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SpawnEnemy)
+	float SpawnEnemyYBegin;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SpawnEnemy)
+	float SpawnEnemyYEnd;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SpawnEnemy)
+	float SpawnEnemyZ;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Turret)
 	FString turret1_name;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Turret)
@@ -91,6 +106,7 @@ private:
 	float level_time;
 	float pre_spawn_counter;
 	float spawn_delay;
+	bool losed;
 //My methods
 private:
 	OptionPtr<UWorld> get_world();
@@ -111,7 +127,7 @@ public:
 
 	FString create_difficulty_level_name();
 //My Events
-public:
+private:
 	//Вызывается до старта матча и устанавливает акторы, значения переменным
 	void on_before_match();
 
@@ -124,5 +140,12 @@ public:
 	//Вызывается каждый тик
 	void on_tick(float dt);
 
+	//Вызывается, если мы проиграли(все игроки мертвы)
+	void on_losed();
+
 	void on_spawn_enemies(UWorld& world);
+
+	bool check_lose();
+
+	void set_losed();
 };

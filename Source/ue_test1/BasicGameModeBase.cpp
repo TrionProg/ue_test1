@@ -9,6 +9,7 @@
 #include "BasicGameStateBase.h"
 #include "Runtime/Engine/Classes/Engine/World.h"
 #include "MyPlayerController.h"
+#include "Enemy.h"
 #include "Math/UnrealMathUtility.h"
 
 //UE events and methods
@@ -179,6 +180,7 @@ void ABasicGameModeBase::set_difficulty_level(int32 next_level) {
 	level_time = level->LevelTime;;
 	pre_spawn_counter = 0;
 	spawn_delay = level->SpawnDelay;
+	losed = false;
 
 	if (auto world = get_world().match()) {
 		auto level_name = create_difficulty_level_name();
@@ -255,6 +257,17 @@ void ABasicGameModeBase::on_clear_match() {
 }
 
 void ABasicGameModeBase::on_tick(float dt) {
+	if (losed) {
+		UE_LOG(LogTemp, Warning, TEXT("Losed =((("));
+		on_losed();
+
+		return;
+	}
+
+	if (check_lose()) {
+		return;
+	}
+
 	auto money_increase = (float)MoneyIncrease * dt;
 
 	if (auto world = get_world().match()) {
@@ -295,10 +308,59 @@ void ABasicGameModeBase::on_spawn_enemies(UWorld& world) {
 
 void ABasicGameModeBase::try_spawn_enemy(UWorld& world, TSubclassOf<class AEnemy>& enemy, float freq) {
 	if (FMath::RandRange(0.0f, 1.0f) < freq) {
-		auto y_position = FMath::RandRange(-620.0f, 620.0f);
+		auto y_position = FMath::RandRange(SpawnEnemyYBegin, SpawnEnemyYEnd);
 
-		auto pos = FVector(800, y_position, 0);
+		auto pos = FVector(SpawnEnemyX, y_position, SpawnEnemyZ);
 
-		AActor* my_actor = (AActor*)world.SpawnActor(enemy, &pos);
+		AActor* my_actor = (AActor*)world.SpawnActor(enemy, &pos);//TODO attribs
 	}
+}
+
+void ABasicGameModeBase::on_losed() {
+	restart_game();
+}
+
+bool ABasicGameModeBase::check_lose() {
+	if (auto world = get_world().match()) {
+		TArray<AActor*> found_actors;
+
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), found_actors);
+
+		for (AActor* abstract_actor : found_actors) {
+			AEnemy* enemy = Cast<AEnemy>(abstract_actor);
+
+			if (enemy != nullptr) {
+				if (enemy->is_alive()) {
+					auto location = enemy->GetActorLocation();
+
+					if (location.X < LosePosition) {
+						enemy->kill();
+
+						auto all_are_dead = true;
+
+						for (FConstPlayerControllerIterator iter = world->GetPlayerControllerIterator(); iter; ++iter) {
+							auto player_controller = (AMyPlayerController*)iter->Get(); //TODO safe cast
+
+							if (player_controller) {
+								if (!player_controller->decrement_health()) {//этот игрок жив
+									all_are_dead = false;
+								}
+							}
+						}
+
+						if (all_are_dead) {
+							set_losed();
+							return true;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+void ABasicGameModeBase::set_losed() {
+	losed = true;
 }

@@ -8,6 +8,8 @@
 #include "GameFramework/Pawn.h"
 #include "GameFramework/Character.h"
 #include "MyPawnMovementComponent.h"
+#include "OptionPtr.h"
+
 #include "Enemy.generated.h"
 
 UCLASS()
@@ -18,6 +20,9 @@ class UE_TEST1_API AEnemy : public ACharacter//APawn
 protected:
 	//UPROPERTY(EditAnyWhere)
 	//UShapeComponent* collision;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	USceneComponent* body_base;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* sphere1;
@@ -60,11 +65,17 @@ public:
 private:
 	f32 health;
 	f32 speed;
+	float body_swing = 0;
 //My methods
+private:
+	OptionPtr<UWorld> get_world();
+
+	void animate(float dt);
 protected:
 	UFUNCTION(BlueprintCallable)
 	void slow_down(float dmg);
 public:	
 	int32 get_reward();
 	bool is_alive();
+	void kill();
 };
