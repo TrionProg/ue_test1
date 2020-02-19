@@ -56,6 +56,7 @@ private:
 	OptionPtr<AEnemy> target;
 	float shot_interval_progress;
 
+//My methods
 private:
 	OptionPtr<UWorld> get_world();
 
@@ -72,4 +73,6 @@ public:
 	void on_enemy_died(AEnemy* enemy);
 
 	uint8 get_type();
+
+	void set_target(AEnemy& enemy);
 };

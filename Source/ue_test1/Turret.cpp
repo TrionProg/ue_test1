@@ -259,3 +259,7 @@ void ATurret::on_enemy_died(AEnemy* enemy) {
 uint8 ATurret::get_type() {
 	return type;
 }
+
+void ATurret::set_target(AEnemy& enemy) {
+	target.set(&enemy);
+}

@@ -10,7 +10,9 @@
 #include "Runtime/Engine/Classes/Engine/World.h"
 #include "MyPlayerController.h"
 #include "Enemy.h"
+#include "Turret.h"
 #include "Math/UnrealMathUtility.h"
+#include "FlyingSpot.h"
 
 //UE events and methods
 
@@ -242,6 +244,9 @@ void ABasicGameModeBase::on_before_match() {
 	set_difficulty_level(0);
 
 	current_level = 0;
+
+	fugitive = OptionPtr<AEnemy>::new_none();
+	fugitive_flying_spot = OptionPtr<AFlyingSpot>::new_none();
 }
 
 void ABasicGameModeBase::on_start_match() {
@@ -266,6 +271,10 @@ void ABasicGameModeBase::on_tick(float dt) {
 
 	if (check_lose()) {
 		return;
+	}
+
+	if (fugitive.is_none()) {
+		find_fugitive();
 	}
 
 	auto money_increase = (float)MoneyIncrease * dt;
@@ -324,7 +333,7 @@ bool ABasicGameModeBase::check_lose() {
 	if (auto world = get_world().match()) {
 		TArray<AActor*> found_actors;
 
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), found_actors);
+		UGameplayStatics::GetAllActorsOfClass(world, AEnemy::StaticClass(), found_actors);
 
 		for (AActor* abstract_actor : found_actors) {
 			AEnemy* enemy = Cast<AEnemy>(abstract_actor);
@@ -363,4 +372,83 @@ bool ABasicGameModeBase::check_lose() {
 
 void ABasicGameModeBase::set_losed() {
 	losed = true;
+}
+
+void ABasicGameModeBase::find_fugitive() {
+	if (auto world = get_world().match()) {
+		TArray<AActor*> found_actors;
+
+		UGameplayStatics::GetAllActorsOfClass(world, AEnemy::StaticClass(), found_actors);
+
+		auto found_fugitive = OptionPtr<AEnemy>::new_none();
+		auto fugitive_dist = 0;
+
+		for (AActor* abstract_actor : found_actors) {
+			AEnemy* enemy = Cast<AEnemy>(abstract_actor);
+
+			if (enemy != nullptr) {
+				if (enemy->is_alive()) {
+					auto location = enemy->GetActorLocation();
+
+					if (location.X < FugitivePosition) {
+						auto dist = FugitivePosition - location.X;
+
+						if (dist > fugitive_dist) {
+							fugitive_dist = dist;
+							found_fugitive.set(enemy);
+						}
+					}
+				}
+			}
+		}
+
+		if (auto fnd_fugitive = found_fugitive.match()) {
+			set_fugitive(*world, *fnd_fugitive);
+		}
+	}
+}
+
+void ABasicGameModeBase::set_fugitive(UWorld& world, AEnemy& found_fugitive) {
+	fugitive.set(&found_fugitive);
+
+	auto enemy_location = found_fugitive.GetActorLocation();
+	auto fugitive_flying_spot_lication = FVector(
+		enemy_location.X,
+		enemy_location.Y,
+		enemy_location.Z + 10000 //TODO HOVER HEIGHT
+	);
+
+	AActor* my_actor = (AActor*)world.SpawnActor(FugitiveFlyingSpot, &fugitive_flying_spot_lication);//TODO attribs
+
+	if (auto flying_spot = (AFlyingSpot*)world.SpawnActor(FugitiveFlyingSpot, &fugitive_flying_spot_lication)) {
+		flying_spot->set_hover_on_target(*(AActor*)&found_fugitive);
+		fugitive_flying_spot.set(flying_spot);
+	}
+
+	//TODO may be calculate level of danger?
+
+	TArray<AActor*> found_actors;
+
+	UGameplayStatics::GetAllActorsOfClass(&world, ATurret::StaticClass(), found_actors);
+
+	for (AActor* abstract_actor : found_actors) {
+		ATurret* turret = Cast<ATurret>(abstract_actor);
+
+		if (turret != nullptr) {
+			turret->set_target(found_fugitive);
+		}
+	}
+}
+
+void ABasicGameModeBase::reset_fugitive(AEnemy& enemy) {
+	if (auto current_fugitive = fugitive.match()) {
+		if (current_fugitive == &enemy) {
+			fugitive.reset();
+
+			if (auto flying_spot = fugitive_flying_spot.match()) {
+				flying_spot->Destroy();
+				fugitive_flying_spot.reset();
+			}
+		}
+	}
 }

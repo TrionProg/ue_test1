@@ -62,6 +62,7 @@ bool ABuildSpot::build(uint8 turret_type) {
 
 	//TODO сначала попробуем создать, а лишь затем удал€ем
 	//ј тут трабла, что существующа€ турель будет мешать. Ќадо видимо провер€ть, есть ли кто-то в радиусе
+	//TODO spawn properties
 
 	if (auto world = get_world().match()) {
 		auto pos = GetActorLocation();

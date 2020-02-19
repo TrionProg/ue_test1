@@ -69,6 +69,7 @@ private:
 //My methods
 private:
 	OptionPtr<UWorld> get_world();
+	OptionPtr<class ABasicGameModeBase> get_game_mode();
 
 	void animate(float dt);
 protected:

@@ -12,7 +12,9 @@
 #include "Runtime/Engine/Classes/Components/CapsuleComponent.h"
 #include "MyPlayerController.h"
 #include "Turret.h"
+#include "Runtime/Engine/Classes/Engine/World.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "BasicGameModeBase.h"
 
 //UE events and methods
 
@@ -135,6 +137,10 @@ void AEnemy::Destroyed(AActor* DestroyedActor) {
 			}
 		}
 	}
+
+	if (auto game_mode = get_game_mode().match()) {
+		game_mode->reset_fugitive(*this);
+	}
 }
 
 void AEnemy::Reset() {
@@ -149,6 +155,19 @@ void AEnemy::Reset() {
 
 OptionPtr<UWorld> AEnemy::get_world() {
 	return OptionPtr<UWorld>::new_unchecked(GetWorld());
+}
+
+OptionPtr<ABasicGameModeBase> AEnemy::get_game_mode() {
+	if (auto world = get_world().match()) {
+		auto abstract_game_mode = world->GetAuthGameMode();
+		if (abstract_game_mode) {
+			ABasicGameModeBase* game_mode = Cast<ABasicGameModeBase>(abstract_game_mode);
+
+			return OptionPtr<ABasicGameModeBase>::new_unchecked(game_mode);
+		}
+	}
+
+	return OptionPtr<ABasicGameModeBase>::new_none();
 }
 
 int32 AEnemy::get_reward() {

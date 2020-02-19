@@ -31,6 +31,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = Enemy)
 	TSubclassOf<class AEnemy> StrongEnemy;
+
+	UPROPERTY(EditDefaultsOnly, Category = Enemy)
+	TSubclassOf<class AFlyingSpot> FugitiveFlyingSpot;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GameplayConfig)
 	int32 StartMoney;
@@ -43,6 +46,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GameplayConfig)
 	int32 LosePosition;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GameplayConfig)
+	int32 FugitivePosition;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SpawnEnemy)
 	float SpawnEnemyX;
@@ -107,12 +113,16 @@ private:
 	float pre_spawn_counter;
 	float spawn_delay;
 	bool losed;
+
+	OptionPtr<AEnemy> fugitive;
+	OptionPtr<class AFlyingSpot> fugitive_flying_spot;
 //My methods
 private:
 	OptionPtr<UWorld> get_world();
 	OptionPtr<ABasicGameStateBase> get_game_state();
 
 	void try_spawn_enemy(UWorld& world, TSubclassOf<class AEnemy>& enemy, float freq);
+	void set_fugitive(UWorld& world, AEnemy& found_fugitive);
 public:
 	UFUNCTION(BlueprintCallable, Category = "Money")
 	void restart_game();
@@ -148,4 +158,9 @@ private:
 	bool check_lose();
 
 	void set_losed();
+
+	void find_fugitive();
+
+public:
+	void reset_fugitive(AEnemy&);
 };
