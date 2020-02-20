@@ -9,6 +9,9 @@
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "BasicGameModeBase.h"
 
+const float ZOOM_STEP = 100;
+const float MIN_ZOOM_DIST = 400;
+const float MAX_ZOOM_DIST = 2000;
 
 //UE events and methods
 
@@ -36,7 +39,10 @@ ASpectator::ASpectator() : Super()
 
 	spring_arm->TargetArmLength = 1200.0;
 
-	movement_force = 8.0;
+	MovementForce = 100;
+
+	should_move_left = 0;
+	should_move_up = 0;
 
 	//Take control of the default Player
 	//AutoPossessPlayer = EAutoReceiveInput::Player0; //TODO ??
@@ -53,6 +59,9 @@ void ASpectator::BeginPlay()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Spec begin play"));
 	Super::BeginPlay();
+
+	should_move_left = 0;
+	should_move_up = 0;
 }
 
 // Called to bind functionality to input
@@ -61,6 +70,9 @@ void ASpectator::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	InputComponent = PlayerInputComponent;
+
+	InputComponent->BindAction("ZoomIn", IE_Pressed, this, &ASpectator::zoom_in);//TODO may be and released
+	InputComponent->BindAction("ZoomOut", IE_Pressed, this, &ASpectator::zoom_out);
 
 	//InputComponent->BindAxis("move up", this, &ASpectator::move_up);
 	//InputComponent->BindAxis("move right", this, &ASpectator::move_right);
@@ -71,6 +83,14 @@ void ASpectator::Tick(float dt)
 {
 	Super::Tick(dt);
 
+	auto location = GetActorLocation();
+	auto new_location = FVector(
+		location.X + should_move_left * MovementForce * dt,
+		location.Y + should_move_up * MovementForce * dt,
+		location.Z
+	);
+
+	SetActorLocation(new_location);
 }
 
 void ASpectator::Reset() {
@@ -92,15 +112,33 @@ void ASpectator::Destroyed(AActor* DestroyedActor) {
 //My methods
 
 void ASpectator::move_right(float value) {
-	FVector force_to_add = movement_force * value * FVector(0, 1, 0);
-	auto root = (USceneComponent*)RootComponent;
-	root->AddLocalOffset(force_to_add);
+	//FVector force_to_add = movement_force * value * FVector(0, 1, 0);
+	//auto root = (USceneComponent*)RootComponent;
+	//root->AddLocalOffset(force_to_add);
+	should_move_left = -value;
 }
 
 void ASpectator::move_up(float value) {
-	FVector force_to_add = movement_force * value * FVector(1, 0, 0);
-	auto root = (USceneComponent*)RootComponent;
-	root->AddLocalOffset(force_to_add);
+	//FVector force_to_add = movement_force * value * FVector(1, 0, 0);
+	//auto root = (USceneComponent*)RootComponent;
+	//root->AddLocalOffset(force_to_add);
+	should_move_up = value;
+}
+
+void ASpectator::zoom_in() {
+	if (spring_arm->TargetArmLength - ZOOM_STEP > MIN_ZOOM_DIST) {
+		spring_arm->TargetArmLength -= ZOOM_STEP;
+	}else {
+		spring_arm->TargetArmLength = MIN_ZOOM_DIST;
+	}
+}
+
+void ASpectator::zoom_out() {
+	if (spring_arm->TargetArmLength + ZOOM_STEP < MAX_ZOOM_DIST) {
+		spring_arm->TargetArmLength += ZOOM_STEP;
+	}else {
+		spring_arm->TargetArmLength = MAX_ZOOM_DIST;
+	}
 }
 
 bool ASpectator::build(int32 turret_type) {

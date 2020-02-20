@@ -133,6 +133,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Turret")
 	int32 get_turret_price(uint8 turret_type);
 
+	UFUNCTION(BlueprintCallable)
+	float get_enemy_dest_position();
+
 	void set_difficulty_level(int32 level);
 
 	FString create_difficulty_level_name();

@@ -27,7 +27,7 @@ protected:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float movement_force;
+	float MovementForce;
 
 //UE events and methods
 protected:
@@ -47,10 +47,14 @@ public:
 	ASpectator();
 
 protected:
-
+	float should_move_left;
+	float should_move_up;
 public:	
 	void move_up(float value);
 	void move_right(float value);
+
+	void zoom_in();
+	void zoom_out();
 
 	bool build(int32 turret_type);
 };

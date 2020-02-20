@@ -452,3 +452,7 @@ void ABasicGameModeBase::reset_fugitive(AEnemy& enemy) {
 		}
 	}
 }
+
+float ABasicGameModeBase::get_enemy_dest_position() {
+	return LosePosition - 100.0;
+}

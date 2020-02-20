@@ -65,6 +65,8 @@ private:
 	void on_key_space_release();
 	void on_key_r_release();
 
+	void on_key_q_press();
+
 	void pause();
 	void restart_game();
 

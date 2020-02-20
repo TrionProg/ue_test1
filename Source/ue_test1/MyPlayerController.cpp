@@ -5,6 +5,7 @@
 #include "BasicGameModeBase.h"
 #include "Spectator.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 //UE events and methods
 
@@ -34,8 +35,8 @@ void AMyPlayerController::SetupInputComponent() {
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
-	InputComponent->BindAxis("move up", this, &AMyPlayerController::move_up);
-	InputComponent->BindAxis("move right", this, &AMyPlayerController::move_right);
+	InputComponent->BindAxis("move up", this, &AMyPlayerController::move_up).bExecuteWhenPaused = true;
+	InputComponent->BindAxis("move right", this, &AMyPlayerController::move_right).bExecuteWhenPaused = true;
 
 	InputComponent->BindAction("LMBClick", IE_Released, this, &AMyPlayerController::on_lmb_release);
 
@@ -45,6 +46,7 @@ void AMyPlayerController::SetupInputComponent() {
 
 	InputComponent->BindAction("Pause", IE_Released, this, &AMyPlayerController::on_key_space_release).bExecuteWhenPaused = true;
 	InputComponent->BindAction("Restart", IE_Released, this, &AMyPlayerController::on_key_r_release).bExecuteWhenPaused = true;
+	InputComponent->BindAction("Quit", IE_Pressed, this, &AMyPlayerController::on_key_q_press).bExecuteWhenPaused = true;
 	//InputComponent->BindAction("TogglePause", EInputEvent::IE_Pressed, this, &MyPlayerController::TogglePause).bExecuteWhenPaused = true;
 
 	//TODO some code:InputComponent->BindAction("TogglePause", EInputEvent::IE_Pressed, this, &MyPlayerController::TogglePause).bExecuteWhenPaused = true;
@@ -164,6 +166,12 @@ void AMyPlayerController::on_key_space_release() {
 
 void AMyPlayerController::on_key_r_release() {
 	restart_game();
+}
+
+void AMyPlayerController::on_key_q_press() {
+	if (auto world = get_world().match()) {
+		UKismetSystemLibrary::QuitGame(world, this, EQuitPreference::Type::Quit);
+	}
 }
 
 void AMyPlayerController::pause() {
