@@ -34,6 +34,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = Enemy)
 	TSubclassOf<class AFlyingSpot> FugitiveFlyingSpot;
+
+	UPROPERTY(EditDefaultsOnly, Category = TurretDestroyer)
+	TSubclassOf<class ATurretDestroyer> TurretDestroyer;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GameplayConfig)
 	int32 StartMoney;
@@ -61,6 +64,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SpawnEnemy)
 	float SpawnEnemyZ;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TurretDestroyer)
+	float SpawnTurretDestroyerZ;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Turret)
 	FString turret1_name;
@@ -109,6 +115,7 @@ private:
 	float spawn_weak_enemy_freq;
 	float spawn_medium_enemy_freq;
 	float spawn_strong_enemy_freq;
+	float spawn_turret_destroyer_freq;
 	float level_time;
 	float pre_spawn_counter;
 	float spawn_delay;
@@ -123,6 +130,7 @@ private:
 
 	void try_spawn_enemy(UWorld& world, TSubclassOf<class AEnemy>& enemy, float freq);
 	void set_fugitive(UWorld& world, AEnemy& found_fugitive);
+	void try_spawn_turret_destroyer(UWorld& world);
 public:
 	UFUNCTION(BlueprintCallable, Category = "Money")
 	void restart_game();

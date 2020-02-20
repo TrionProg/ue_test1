@@ -47,6 +47,9 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION()
+	void Destroyed(AActor* DestroyedActor);
 public:
 	// Sets default values for this pawn's properties
 	ATurret();

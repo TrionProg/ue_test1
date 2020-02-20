@@ -31,6 +31,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enemy)
 	float StrongEnemySpawnFrequency;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enemy)
+	float TurretDestroyerSpawnFrequency;
 public:
 	UDifficultyLevel();
 	~UDifficultyLevel();

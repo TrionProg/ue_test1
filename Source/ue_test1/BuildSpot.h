@@ -48,4 +48,5 @@ private:
 	bool spawn_turret(UWorld& world, TSubclassOf<class ATurret>& turret, FVector& pos);
 public:	
 	bool build(uint8 turret_type);
+	void on_turret_destoyed(class ATurret& turret);
 };

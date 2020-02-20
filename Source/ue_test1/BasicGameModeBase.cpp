@@ -13,6 +13,7 @@
 #include "Turret.h"
 #include "Math/UnrealMathUtility.h"
 #include "FlyingSpot.h"
+#include "TurretDestroyer.h"
 
 //UE events and methods
 
@@ -179,6 +180,7 @@ void ABasicGameModeBase::set_difficulty_level(int32 next_level) {
 	spawn_weak_enemy_freq = level->WeakEnemySpawnFrequency;
 	spawn_medium_enemy_freq = level->MediumEnemySpawnFrequency;
 	spawn_strong_enemy_freq = level->StrongEnemySpawnFrequency;
+	spawn_turret_destroyer_freq = level->TurretDestroyerSpawnFrequency;
 	level_time = level->LevelTime;;
 	pre_spawn_counter = 0;
 	spawn_delay = level->SpawnDelay;
@@ -313,15 +315,46 @@ void ABasicGameModeBase::on_spawn_enemies(UWorld& world) {
 	try_spawn_enemy(world, WeakEnemy, spawn_weak_enemy_freq);
 	try_spawn_enemy(world, MediumEnemy, spawn_medium_enemy_freq);
 	try_spawn_enemy(world, StrongEnemy, spawn_strong_enemy_freq);
+	try_spawn_turret_destroyer(world);
 }
 
 void ABasicGameModeBase::try_spawn_enemy(UWorld& world, TSubclassOf<class AEnemy>& enemy, float freq) {
-	if (FMath::RandRange(0.0f, 1.0f) < freq) {
+	if (FMath::RandRange(0.0f, 1.0f) <= freq) {
 		auto y_position = FMath::RandRange(SpawnEnemyYBegin, SpawnEnemyYEnd);
 
 		auto pos = FVector(SpawnEnemyX, y_position, SpawnEnemyZ);
 
 		AActor* my_actor = (AActor*)world.SpawnActor(enemy, &pos);//TODO attribs
+	}
+}
+
+void ABasicGameModeBase::try_spawn_turret_destroyer(UWorld& world) {
+	if (FMath::RandRange(0.0f, 1.0f) <= spawn_turret_destroyer_freq) {
+		TArray<AActor*> found_actors;
+		TArray<ATurret*> found_turrets;
+
+		UGameplayStatics::GetAllActorsOfClass(&world, ATurret::StaticClass(), found_actors);
+
+		for (AActor* abstract_actor : found_actors) {
+			ATurret* turret = Cast<ATurret>(abstract_actor);
+
+			if (turret != nullptr) {
+				found_turrets.Add(turret);
+			}
+		}
+
+		if (found_turrets.Num() > 0) {
+			auto index = FMath::RandRange(0, found_turrets.Num());
+
+			if (found_turrets.IsValidIndex(index)) {
+				auto turret = found_turrets[index];
+
+				auto turret_location = turret->GetActorLocation();
+				auto pos = FVector(SpawnEnemyX, turret_location.Y, SpawnTurretDestroyerZ);
+
+				AActor* my_actor = (AActor*)world.SpawnActor(TurretDestroyer, &pos);//TODO attribs
+			}
+		}
 	}
 }
 

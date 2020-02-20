@@ -8,6 +8,7 @@
 
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "Runtime/Engine/Classes/Engine/World.h"
+#include "BuildSpot.h"
 
 //UE events and methods
 
@@ -49,6 +50,8 @@ ATurret::ATurret() : Super()
 
 	target = OptionPtr<AEnemy>::new_none();
 	shot_interval_progress = shot_interval;
+
+	this->OnDestroyed.AddDynamic(this, &ATurret::Destroyed);
 }
 
 // Called when the game starts or when spawned
@@ -94,6 +97,24 @@ void ATurret::Tick(float dt)
 
 		if (shot_interval_progress == shot_interval) {
 			shoot();
+		}
+	}
+}
+
+void ATurret::Destroyed(AActor* DestroyedActor) {
+	//We need release BuildSpot
+
+	if (auto world = get_world().match()) {
+		TArray<AActor*> found_actors;
+
+		UGameplayStatics::GetAllActorsOfClass((UObject*)world, ABuildSpot::StaticClass(), found_actors);
+
+		for (AActor* abstract_actor : found_actors) {
+			ABuildSpot* build_spot = Cast<ABuildSpot>(abstract_actor);
+
+			if (build_spot) {
+				build_spot->on_turret_destoyed(*this);
+			}
 		}
 	}
 }

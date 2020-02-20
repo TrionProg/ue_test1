@@ -13,9 +13,12 @@ UCLASS()
 class UE_TEST1_API UMyPawnMovementComponent : public UPawnMovementComponent
 {
 	GENERATED_BODY()
-	
+//UE variables	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Speed;
+
 public:
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
-	
 	
 };

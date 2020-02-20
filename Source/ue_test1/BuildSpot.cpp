@@ -107,3 +107,11 @@ bool ABuildSpot::spawn_turret(UWorld& world, TSubclassOf<class ATurret>& new_tur
 
 	return false;
 }
+
+void ABuildSpot::on_turret_destoyed(class ATurret& reseted_turret) {
+	if (auto existing_turret = turret.match()) {
+		if (existing_turret == &reseted_turret) {
+			turret.reset();
+		}
+	}
+}
