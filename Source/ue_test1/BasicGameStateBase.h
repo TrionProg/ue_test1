@@ -13,7 +13,11 @@ UCLASS()
 class UE_TEST1_API ABasicGameStateBase : public AGameState
 {
 	GENERATED_BODY()
+protected:
+	friend class ABasicGameModeBase;
+
+	UPROPERTY() //TODO Replication
+	float level_time;
 public:
-	//UPROPERTY() //TODO Replication
-	//float level_time;
+	float get_level_time();
 };

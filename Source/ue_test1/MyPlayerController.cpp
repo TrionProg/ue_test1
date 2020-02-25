@@ -8,6 +8,7 @@
 #include "Spectator.h"
 #include "MyPlayerState.h"
 #include "BasicGameModeBase.h"
+#include "BasicGameStateBase.h"
 #include "TurretType.h"
 
 //UE events and methods
@@ -114,6 +115,14 @@ OptionPtr<ABasicGameModeBase> AMyPlayerController::get_game_mode() {
 	return OptionPtr<ABasicGameModeBase>::new_none();
 }
 
+OptionPtr<ABasicGameStateBase> AMyPlayerController::get_game_state() {
+	if (auto world = get_world().match()) {
+		return OptionPtr<ABasicGameStateBase>::new_unchecked(world->GetGameState<ABasicGameStateBase>());
+	}else {
+		return OptionPtr<ABasicGameStateBase>::new_none();
+	}
+}
+
 void AMyPlayerController::change_menu_widget(TSubclassOf<UUserWidget> NewWidgetClass)
 {
 	if (!IsLocalController()) {
@@ -200,11 +209,14 @@ void AMyPlayerController::draw_hud() {
 		return;
 	}
 
-	if (auto player_state = get_player_state().match()) {
-		auto hud = (UMyHUD*)CurrentWidget;
+	auto hud = (UMyHUD*)CurrentWidget;
 
+	if (auto player_state = get_player_state().match()) {
 		hud->SetMoney(player_state->money);
-		hud->SetDifficultyLevelTime(player_state->level_time); //TODO or get level_time from GameState?
+	}
+
+	if (auto game_state = get_game_state().match()) {
+		hud->SetDifficultyLevelTime(game_state->get_level_time());
 	}
 }
 
@@ -265,12 +277,6 @@ void AMyPlayerController::set_difficulty_level(FString name) {
 	}
 }
 
-void AMyPlayerController::set_difficulty_level_time(int32 time) {
-	if (auto player_state = get_player_state().match()) {
-		player_state->level_time = time;
-	}
-}
-
 void AMyPlayerController::set_health(int32 health) {
 	if (auto player_state = get_player_state().match()) {
 		player_state->health = health;
@@ -308,6 +314,6 @@ void AMyPlayerController::on_before_match() {
 
 void AMyPlayerController::on_tick(float dt) {
 	if (auto player_state = get_player_state().match()) {
-		player_state->level_time -= dt;
+		
 	}
 }

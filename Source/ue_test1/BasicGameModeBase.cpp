@@ -184,10 +184,13 @@ void ABasicGameModeBase::set_difficulty_level(int32 next_level) {
 	spawn_medium_enemy_freq = level->MediumEnemySpawnFrequency;
 	spawn_strong_enemy_freq = level->StrongEnemySpawnFrequency;
 	spawn_turret_destroyer_freq = level->TurretDestroyerSpawnFrequency;
-	level_time = level->LevelTime;;
 	pre_spawn_counter = 0;
 	spawn_delay = level->SpawnDelay;
 	losed = false;
+
+	if (auto game_state = get_game_state().match()) {
+		game_state->level_time = level->LevelTime;
+	}
 
 	if (auto world = get_world().match()) {
 		auto level_name = create_difficulty_level_name();
@@ -197,7 +200,6 @@ void ABasicGameModeBase::set_difficulty_level(int32 next_level) {
 
 			if (player_controller) {
 				player_controller->set_difficulty_level(level_name);
-				player_controller->set_difficulty_level_time(level_time);
 			}
 		}
 	}
@@ -294,13 +296,15 @@ void ABasicGameModeBase::on_tick(float dt) {
 		}
 	}
 
-	level_time -= dt;
+	if (auto game_state = get_game_state().match()) {
+		game_state->level_time -= dt;
 
-	if (level_time < 0.0) {
-		current_level += 1;
+		if (game_state->level_time < 0.0) {
+			current_level += 1;
 
-		//Will be limited automatically
-		set_difficulty_level(current_level);
+			//Will be limited automatically
+			set_difficulty_level(current_level);
+		}
 	}
 
 	pre_spawn_counter += dt;

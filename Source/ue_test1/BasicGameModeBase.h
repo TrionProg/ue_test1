@@ -113,7 +113,6 @@ private:
 	float spawn_medium_enemy_freq;
 	float spawn_strong_enemy_freq;
 	float spawn_turret_destroyer_freq;
-	float level_time;
 	float pre_spawn_counter;
 	float spawn_delay;
 	bool losed;

@@ -30,9 +30,6 @@ friend class AMyPlayerController;
 
 	UPROPERTY() //TODO Replication
 	int32 health;
-
-	UPROPERTY() //TODO Replication
-	float level_time;
 	
 	
 };

@@ -3,5 +3,7 @@
 #include "BasicGameStateBase.h"
 
 
-
+float ABasicGameStateBase::get_level_time() {
+	return level_time;
+}
 

@@ -47,7 +47,8 @@ private:
 	OptionPtr<UWorld> get_world();
 	OptionPtr<class ASpectator> get_spectator();
 	OptionPtr<class AMyPlayerState> get_player_state();
-	OptionPtr<class ABasicGameModeBase> get_game_mode();
+	OptionPtr<class ABasicGameModeBase> get_game_mode(); //TODO only on server
+	OptionPtr<class ABasicGameStateBase> get_game_state();
 private:
 	//Removes the current menu widget and create a new one from the specified class, if provided.
 	UFUNCTION(BlueprintCallable, Category = "UMG")
@@ -85,7 +86,6 @@ public:
 	void give_money(float money);
 
 	void set_difficulty_level(FString name);
-	void set_difficulty_level_time(int32 time);
 
 	void set_health(int32 health);
 	bool decrement_health();
