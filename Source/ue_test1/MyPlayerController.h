@@ -6,10 +6,11 @@
 #include "GameFramework/PlayerController.h"
 #include "OptionPtr.h"
 
+enum class ETurretType : uint8;
+
 #include "MyPlayerController.generated.h"
 
 class AMyPlayerState;
-enum class ETurretType : uint8;
 
 /**
  * 

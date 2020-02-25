@@ -11,12 +11,10 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Runtime/Engine/Classes/Components/CapsuleComponent.h"
 #include "MyPlayerController.h"
-//#include "Turret.h"
 #include "Runtime/Engine/Classes/Engine/World.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "Turret.h"
 #include "BasicGameModeBase.h"
-//#include "Turret.h"
 
 //UE events and methods
 

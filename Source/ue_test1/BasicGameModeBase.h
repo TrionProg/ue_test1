@@ -6,9 +6,10 @@
 #include "GameFramework/GameMode.h"
 #include "OptionPtr.h"
 
+#include "TurretType.h"
+
 #include "BasicGameModeBase.generated.h"
 
-enum class ETurretType : uint8;
 
 /**
  * 

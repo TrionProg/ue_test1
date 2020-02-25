@@ -8,8 +8,8 @@
 #include "BuildSpot.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "Turret.h"
+#include "TurretType.h"
 #include "BasicGameModeBase.h"
-//#include "Turret.h"
 
 const float ZOOM_STEP = 100;
 const float MIN_ZOOM_DIST = 400;

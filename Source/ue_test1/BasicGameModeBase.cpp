@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Turret.h"
 #include "BasicGameModeBase.h"
 #include "Spectator.h"
 #include "MyPlayerController.h"
@@ -11,7 +10,8 @@
 #include "Runtime/Engine/Classes/Engine/World.h"
 #include "MyPlayerController.h"
 #include "Enemy.h"
-//#include "Turret.h"
+#include "TurretType.h"
+#include "Turret.h"
 #include "Math/UnrealMathUtility.h"
 #include "FlyingSpot.h"
 #include "TurretDestroyer.h"
@@ -148,7 +148,7 @@ FString ABasicGameModeBase::get_turret_name(ETurretType turret_type) {
 		return turret3_name;
 	}
 
-	//return TEXT("No such turret");
+	return TEXT("No such turret"); //TODO unreachable
 }
 
 //TODO unreachable, exception, enum
@@ -162,7 +162,7 @@ int32 ABasicGameModeBase::get_turret_price(ETurretType turret_type) {
 		return turret3_price;
 	}
 
-	//return 0;
+	return 0; //TODO unreachable
 }
 
 void ABasicGameModeBase::set_difficulty_level(int32 next_level) {

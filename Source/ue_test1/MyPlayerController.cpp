@@ -2,14 +2,13 @@
 
 #include "MyPlayerController.h"
 #include "MyHUD.h"
-//#include "BasicGameModeBase.h"
 #include "Spectator.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "Turret.h"
 #include "Spectator.h"
 #include "MyPlayerState.h"
 #include "BasicGameModeBase.h"
+#include "TurretType.h"
 
 //UE events and methods
 
@@ -153,15 +152,15 @@ void AMyPlayerController::on_lmb_release() {
 }
 
 void AMyPlayerController::on_key1_release() {
-	select_turret_type(1);
+	select_turret_type(ETurretType::Machinegun);
 }
 
 void AMyPlayerController::on_key2_release() {
-	select_turret_type(2);
+	select_turret_type(ETurretType::Freeze);
 }
 
 void AMyPlayerController::on_key3_release() {
-	select_turret_type(3);
+	select_turret_type(ETurretType::Pierce);
 }
 
 void AMyPlayerController::on_key_space_release() {

@@ -11,6 +11,7 @@
 #include "BuildSpot.h"
 #include "Enemy.h"
 #include "Projectile.h"
+#include "TurretType.h"
 
 //UE events and methods
 
@@ -279,7 +280,7 @@ void ATurret::on_enemy_died(AEnemy* enemy) {
 	}
 }
 
-TurretType ATurret::get_type() {
+ETurretType ATurret::get_type() {
 	return type;
 }
 

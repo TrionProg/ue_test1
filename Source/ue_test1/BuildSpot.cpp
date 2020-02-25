@@ -6,6 +6,7 @@
 #include "Materials/Material.h"
 #include "Runtime/Engine/Classes/Engine/World.h"
 #include "Turret.h"
+#include "TurretType.h"
 
 //UE events and methods
 // Sets default values
@@ -53,7 +54,7 @@ void ABuildSpot::Reset()
 bool ABuildSpot::build(ETurretType turret_type) {
 	if (auto existing_turret = turret.match()) {
 		//Строим лишь то, что круче
-		if (turret_type > existing_turret->get_type()) {
+		if ((uint8)turret_type > (uint8)existing_turret->get_type()) {
 			existing_turret->Destroy();
 			turret.reset();
 		}else {

@@ -6,18 +6,12 @@
 #include "GameFramework/Pawn.h"
 #include "OptionPtr.h"
 
+enum class ETurretType : uint8;
+
 #include "Turret.generated.h"
 
 const float TURRET_BARREL_NORMAL_POSITION = 50;
 const float TURRET_MUZZLE_POSITION = 90;
-
-UENUM(BlueprintType)
-enum class TurretType : uint8
-{
-	Machinegun 	UMETA(DisplayName = "Machinegun -- just shoot in enemies"),
-	Freeze 		UMETA(DisplayName = "Freeze -- damage and freeze enemies"),
-	Pierce		UMETA(DisplayName = "Pierce multiple enemies")
-};
 
 UCLASS()
 class UE_TEST1_API ATurret : public APawn
@@ -43,7 +37,7 @@ public:
 	float shot_interval;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) //EditAnywhere
-	TurretType type;
+	ETurretType type;
 
 //UE events and methods
 protected:
@@ -81,7 +75,7 @@ private:
 public:	
 	void on_enemy_died(class AEnemy* enemy);
 
-	TurretType get_type();
+	ETurretType get_type();
 
 	void set_target(class AEnemy& enemy);
 };

@@ -5,7 +5,6 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 #include "Enemy.h"
-#include "Turret.h"
 
 // Sets default values
 AProjectile::AProjectile()

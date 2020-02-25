@@ -11,9 +11,9 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 
-#include "Spectator.generated.h"
-
 enum class ETurretType : uint8;
+
+#include "Spectator.generated.h"
 
 UCLASS()
 class UE_TEST1_API ASpectator : public APawn

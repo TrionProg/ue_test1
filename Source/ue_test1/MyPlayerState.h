@@ -5,11 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
 #include "MyPlayerController.h"
-#include "Turret.h"
+//#include "Turret.h"
 
 #include "MyPlayerState.generated.h"
 
-//enum class ETurretType : uint8;
+enum class ETurretType : uint8;
 
 /**
  * 

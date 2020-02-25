@@ -6,9 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "OptionPtr.h"
 
-#include "BuildSpot.generated.h"
-
 enum class ETurretType : uint8;
+
+#include "BuildSpot.generated.h"
 
 //TODO may be namespace?
 const float BUILDSPOT_CLICK_RADUS = 100.0;
