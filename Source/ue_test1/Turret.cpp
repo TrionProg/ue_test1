@@ -279,7 +279,7 @@ void ATurret::on_enemy_died(AEnemy* enemy) {
 	}
 }
 
-uint8 ATurret::get_type() {
+TurretType ATurret::get_type() {
 	return type;
 }
 

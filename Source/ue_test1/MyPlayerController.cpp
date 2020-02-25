@@ -2,10 +2,14 @@
 
 #include "MyPlayerController.h"
 #include "MyHUD.h"
-#include "BasicGameModeBase.h"
+//#include "BasicGameModeBase.h"
 #include "Spectator.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Turret.h"
+#include "Spectator.h"
+#include "MyPlayerState.h"
+#include "BasicGameModeBase.h"
 
 //UE events and methods
 
@@ -205,7 +209,7 @@ void AMyPlayerController::draw_hud() {
 	}
 }
 
-void AMyPlayerController::select_turret_type(uint8 turret_type) {
+void AMyPlayerController::select_turret_type(ETurretType turret_type) {
 	if (auto player_state = get_player_state().match()) {
 		if (auto game_mode = get_game_mode().match()) {
 			player_state->current_turret_type = turret_type;
@@ -299,7 +303,7 @@ bool AMyPlayerController::decrement_health() {
 void AMyPlayerController::on_before_match() {
 	if (!CurrentWidget) {
 		change_menu_widget(StartingWidgetClass);
-		select_turret_type(1);
+		select_turret_type(ETurretType::Machinegun);
 	}
 }
 

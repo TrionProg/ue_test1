@@ -4,14 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "Spectator.h"
 #include "OptionPtr.h"
-#include "MyPlayerState.h"
-#include "BasicGameModeBase.h"
 
 #include "MyPlayerController.generated.h"
 
 class AMyPlayerState;
+enum class ETurretType : uint8;
 
 /**
  * 
@@ -46,9 +44,9 @@ private:
 //My methods
 private:
 	OptionPtr<UWorld> get_world();
-	OptionPtr<ASpectator> get_spectator();
-	OptionPtr<AMyPlayerState> get_player_state();
-	OptionPtr<ABasicGameModeBase> get_game_mode();
+	OptionPtr<class ASpectator> get_spectator();
+	OptionPtr<class AMyPlayerState> get_player_state();
+	OptionPtr<class ABasicGameModeBase> get_game_mode();
 private:
 	//Removes the current menu widget and create a new one from the specified class, if provided.
 	UFUNCTION(BlueprintCallable, Category = "UMG")
@@ -72,7 +70,7 @@ private:
 
 	void draw_hud();
 
-	void select_turret_type(uint8 turret_type);
+	void select_turret_type(ETurretType turret_type);
 
 	void build();
 

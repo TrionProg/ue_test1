@@ -1,5 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "Turret.h"
 #include "BasicGameModeBase.h"
 #include "Spectator.h"
 #include "MyPlayerController.h"
@@ -10,7 +11,7 @@
 #include "Runtime/Engine/Classes/Engine/World.h"
 #include "MyPlayerController.h"
 #include "Enemy.h"
-#include "Turret.h"
+//#include "Turret.h"
 #include "Math/UnrealMathUtility.h"
 #include "FlyingSpot.h"
 #include "TurretDestroyer.h"
@@ -137,31 +138,31 @@ void ABasicGameModeBase::restart_game() {
 }
 
 //TODO unreachable, exception, enum
-FString ABasicGameModeBase::get_turret_name(uint8 turret_type) {
+FString ABasicGameModeBase::get_turret_name(ETurretType turret_type) {
 	switch (turret_type) {
-	case 1:
+	case ETurretType::Machinegun:
 		return turret1_name;
-	case 2:
+	case ETurretType::Freeze:
 		return turret2_name;
-	case 3:
+	case ETurretType::Pierce:
 		return turret3_name;
 	}
 
-	return TEXT("No such turret");
+	//return TEXT("No such turret");
 }
 
 //TODO unreachable, exception, enum
-int32 ABasicGameModeBase::get_turret_price(uint8 turret_type) {
+int32 ABasicGameModeBase::get_turret_price(ETurretType turret_type) {
 	switch (turret_type) {
-	case 1:
+	case ETurretType::Machinegun:
 		return turret1_price;
-	case 2:
+	case ETurretType::Freeze:
 		return turret2_price;
-	case 3:
+	case ETurretType::Pierce:
 		return turret3_price;
 	}
 
-	return 0;
+	//return 0;
 }
 
 void ABasicGameModeBase::set_difficulty_level(int32 next_level) {

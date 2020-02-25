@@ -8,6 +8,8 @@
 
 #include "BuildSpot.generated.h"
 
+enum class ETurretType : uint8;
+
 //TODO may be namespace?
 const float BUILDSPOT_CLICK_RADUS = 100.0;
 
@@ -46,6 +48,6 @@ private:
 	OptionPtr<UWorld> get_world();
 	bool spawn_turret(UWorld& world, TSubclassOf<class ATurret>& turret, FVector& pos);
 public:	
-	bool build(uint8 turret_type);
+	bool build(ETurretType turret_type);
 	void on_turret_destoyed(class ATurret& turret);
 };

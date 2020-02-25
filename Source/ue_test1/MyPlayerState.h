@@ -5,8 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
 #include "MyPlayerController.h"
+#include "Turret.h"
 
 #include "MyPlayerState.generated.h"
+
+//enum class ETurretType : uint8;
 
 /**
  * 
@@ -23,7 +26,7 @@ friend class AMyPlayerController;
 	float money;
 
 	UPROPERTY() //TODO Replication
-	uint8 current_turret_type;
+	ETurretType current_turret_type;
 
 	UPROPERTY() //TODO Replication
 	int32 health;

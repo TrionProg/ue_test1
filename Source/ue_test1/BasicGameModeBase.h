@@ -8,6 +8,8 @@
 
 #include "BasicGameModeBase.generated.h"
 
+enum class ETurretType : uint8;
+
 /**
  * 
  */
@@ -130,10 +132,10 @@ public:
 	void restart_game();
 
 	UFUNCTION(BlueprintCallable, Category = "Turret")
-	FString get_turret_name(uint8 turret_type);
+	FString get_turret_name(ETurretType turret_type);
 
 	UFUNCTION(BlueprintCallable, Category = "Turret")
-	int32 get_turret_price(uint8 turret_type);
+	int32 get_turret_price(ETurretType turret_type);
 
 	UFUNCTION(BlueprintCallable)
 	float get_enemy_dest_position();

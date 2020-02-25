@@ -7,7 +7,9 @@
 #include "GameFramework/PlayerController.h"
 #include "BuildSpot.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "Turret.h"
 #include "BasicGameModeBase.h"
+//#include "Turret.h"
 
 const float ZOOM_STEP = 100;
 const float MIN_ZOOM_DIST = 400;
@@ -141,7 +143,7 @@ void ASpectator::zoom_out() {
 	}
 }
 
-bool ASpectator::build(int32 turret_type) {
+bool ASpectator::build(ETurretType turret_type) {
 	if (APlayerController* PC = Cast<APlayerController>(GetController())) {
 		FHitResult TraceHitResult;
 		PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);

@@ -13,6 +13,8 @@
 
 #include "Spectator.generated.h"
 
+enum class ETurretType : uint8;
+
 UCLASS()
 class UE_TEST1_API ASpectator : public APawn
 {
@@ -56,5 +58,5 @@ public:
 	void zoom_in();
 	void zoom_out();
 
-	bool build(int32 turret_type);
+	bool build(ETurretType turret_type);
 };

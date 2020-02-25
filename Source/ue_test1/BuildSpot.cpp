@@ -50,7 +50,7 @@ void ABuildSpot::Reset()
 
 //My methods
 
-bool ABuildSpot::build(uint8 turret_type) {
+bool ABuildSpot::build(ETurretType turret_type) {
 	if (auto existing_turret = turret.match()) {
 		//Строим лишь то, что круче
 		if (turret_type > existing_turret->get_type()) {
@@ -69,19 +69,19 @@ bool ABuildSpot::build(uint8 turret_type) {
 		auto pos = GetActorLocation();
 
 		switch (turret_type) {
-		case 1:
+		case ETurretType::Machinegun:
 			if (!Turret1) return false;//TODO assert?
 
 			return spawn_turret(*world, Turret1, pos);
 
 			break;
-		case 2:
+		case ETurretType::Freeze:
 			if (!Turret2) return false;//TODO assert?
 
 			return spawn_turret(*world, Turret2, pos);
 
 			break;
-		case 3:
+		case ETurretType::Pierce:
 			if (!Turret3) return false;//TODO assert?
 
 			return spawn_turret(*world, Turret3, pos);
