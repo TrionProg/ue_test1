@@ -273,7 +273,6 @@ FRotator ATurret::look_at(FVector actor_pos, FVector lookAt, FVector upDirection
 void ATurret::on_enemy_died(AEnemy* enemy) {
 	if (auto current_target = target.match()) {
 		if (current_target == enemy) {
-			UE_LOG(LogTemp, Warning, TEXT("MyEnemy"));
 			target.reset();
 			find_target();
 		}

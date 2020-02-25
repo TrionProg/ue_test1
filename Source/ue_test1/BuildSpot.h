@@ -42,6 +42,7 @@ public:
 //My variables
 private:
 	OptionPtr<ATurret> turret;
+	TSubclassOf<class ATurret> get_turret(ETurretType turret_type);
 
 //My methods
 private:

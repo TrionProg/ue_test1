@@ -209,11 +209,7 @@ FString ABasicGameModeBase::create_difficulty_level_name() {
 	TSubclassOf<class UDifficultyLevel>& lvl = Levels[current_level];
 	auto level = lvl.GetDefaultObject();
 
-	//UE_LOG(LogTemp, Warning, TEXT("Level: %d %s"), current_level, level->Name);
-
 	FString lvlname = level->Name;
-	UE_LOG(LogTemp, Warning, TEXT("Level: %d %s"), current_level, *lvlname);
-
 	auto level_name = FString::Printf(TEXT("#%d %s"), current_level, *lvlname);
 
 	return level_name;
@@ -222,18 +218,12 @@ FString ABasicGameModeBase::create_difficulty_level_name() {
 //My Events
 
 void ABasicGameModeBase::on_before_match() {
-	UE_LOG(LogTemp, Warning, TEXT("on_before_match"));
-
 	if (auto world = get_world().match()) {
 		for (FConstPlayerControllerIterator iter = world->GetPlayerControllerIterator(); iter; ++iter) {
 			auto player_controller = (AMyPlayerController*)iter->Get(); //TODO safe cast
 			
 			if (player_controller) {
 				player_controller->on_before_match();
-				if (!player_controller) {
-					UE_LOG(LogTemp, Warning, TEXT("AAA"));
-					return;
-				}
 				player_controller->set_health(StartHealth);
 				player_controller->set_money(StartMoney);
 			}
@@ -270,7 +260,6 @@ void ABasicGameModeBase::on_clear_match() {
 
 void ABasicGameModeBase::on_tick(float dt) {
 	if (losed) {
-		UE_LOG(LogTemp, Warning, TEXT("Losed =((("));
 		on_losed();
 
 		return;
@@ -330,8 +319,11 @@ void ABasicGameModeBase::try_spawn_enemy(UWorld& world, TSubclassOf<class AEnemy
 		auto y_position = FMath::RandRange(SpawnEnemyYBegin, SpawnEnemyYEnd);
 
 		auto pos = FVector(SpawnEnemyX, y_position, SpawnEnemyZ);
+		auto rotation = FRotator(0.0, 180.0, 0.0);
+		auto spawn_info = FActorSpawnParameters();
+		spawn_info.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding;
 
-		AActor* my_actor = (AActor*)world.SpawnActor(enemy, &pos);//TODO attribs
+		AActor* my_actor = (AActor*)world.SpawnActor(enemy, &pos, &rotation, spawn_info);
 	}
 }
 
@@ -358,8 +350,11 @@ void ABasicGameModeBase::try_spawn_turret_destroyer(UWorld& world) {
 
 				auto turret_location = turret->GetActorLocation();
 				auto pos = FVector(SpawnEnemyX, turret_location.Y, SpawnTurretDestroyerZ);
+				auto rotation = FRotator(0.0, 180.0, 0.0);
+				auto spawn_info = FActorSpawnParameters();
+				spawn_info.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding;
 
-				AActor* my_actor = (AActor*)world.SpawnActor(TurretDestroyer, &pos);//TODO attribs
+				AActor* my_actor = (AActor*)world.SpawnActor(TurretDestroyer, &pos, &rotation, spawn_info);
 			}
 		}
 	}

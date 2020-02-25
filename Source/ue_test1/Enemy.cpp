@@ -120,7 +120,7 @@ void AEnemy::Tick(float dt)
 }
 
 void AEnemy::Destroyed(AActor* DestroyedActor) {
-	UE_LOG(LogTemp, Log, TEXT("Destroyed Enemy"));
+	//UE_LOG(LogTemp, Log, TEXT("Destroyed Enemy"));
 	//TODO AI Controller will be deleted?
 
 	if (auto world = get_world().match()) {
@@ -129,7 +129,6 @@ void AEnemy::Destroyed(AActor* DestroyedActor) {
 		UGameplayStatics::GetAllActorsOfClass((UObject*)world, ATurret::StaticClass(), found_actors);
 
 		for (AActor* abstract_actor : found_actors) {
-			UE_LOG(LogTemp, Warning, TEXT("Turret"));
 			ATurret* turret = Cast<ATurret>(abstract_actor);
 
 			if (turret) {
