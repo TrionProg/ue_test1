@@ -5,6 +5,7 @@
 #include "Components/DecalComponent.h"
 #include "Materials/Material.h"
 #include "Runtime/Engine/Classes/Engine/World.h"
+#include "Turret.h"
 
 //UE events and methods
 // Sets default values

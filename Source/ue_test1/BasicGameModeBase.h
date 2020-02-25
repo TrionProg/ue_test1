@@ -3,14 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-//#include "GameFramework/GameModeBase.h"
 #include "GameFramework/GameMode.h"
-#include "Enemy.h"
-#include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
-//#include "Blueprint/UserWidget.h"
-#include "BasicGameStateBase.h"
 #include "OptionPtr.h"
-#include "DifficultyLevel.h"
 
 #include "BasicGameModeBase.generated.h"
 
@@ -121,15 +115,15 @@ private:
 	float spawn_delay;
 	bool losed;
 
-	OptionPtr<AEnemy> fugitive;
+	OptionPtr<class AEnemy> fugitive;
 	OptionPtr<class AFlyingSpot> fugitive_flying_spot;
 //My methods
 private:
 	OptionPtr<UWorld> get_world();
-	OptionPtr<ABasicGameStateBase> get_game_state();
+	OptionPtr<class ABasicGameStateBase> get_game_state();
 
 	void try_spawn_enemy(UWorld& world, TSubclassOf<class AEnemy>& enemy, float freq);
-	void set_fugitive(UWorld& world, AEnemy& found_fugitive);
+	void set_fugitive(UWorld& world, class  AEnemy& found_fugitive);
 	void try_spawn_turret_destroyer(UWorld& world);
 public:
 	UFUNCTION(BlueprintCallable, Category = "Money")
@@ -173,5 +167,5 @@ private:
 	void find_fugitive();
 
 public:
-	void reset_fugitive(AEnemy&);
+	void reset_fugitive(class AEnemy&);
 };

@@ -4,8 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "Enemy.h"
-#include "Projectile.h"
 #include "OptionPtr.h"
 
 #include "Turret.generated.h"
@@ -56,7 +54,7 @@ public:
 
 //My variables
 private:
-	OptionPtr<AEnemy> target;
+	OptionPtr<class AEnemy> target;
 	float shot_interval_progress;
 
 //My methods
@@ -73,9 +71,9 @@ private:
 	//посмотреть куда-то
 	FRotator look_at(FVector actor_pos, FVector lookAt, FVector upDirection);
 public:	
-	void on_enemy_died(AEnemy* enemy);
+	void on_enemy_died(class AEnemy* enemy);
 
 	uint8 get_type();
 
-	void set_target(AEnemy& enemy);
+	void set_target(class AEnemy& enemy);
 };

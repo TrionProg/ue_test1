@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Turret.h"
 #include "OptionPtr.h"
 
 #include "BuildSpot.generated.h"

@@ -16,6 +16,4 @@ class UE_TEST1_API ABasicGameStateBase : public AGameState
 public:
 	//UPROPERTY() //TODO Replication
 	//float level_time;
-	
-	
 };

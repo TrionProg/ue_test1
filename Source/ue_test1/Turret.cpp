@@ -9,6 +9,8 @@
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "Runtime/Engine/Classes/Engine/World.h"
 #include "BuildSpot.h"
+#include "Enemy.h"
+#include "Projectile.h"
 
 //UE events and methods
 

@@ -14,6 +14,8 @@
 #include "Math/UnrealMathUtility.h"
 #include "FlyingSpot.h"
 #include "TurretDestroyer.h"
+#include "DifficultyLevel.h"
+#include "BasicGameStateBase.h"
 
 //UE events and methods
 
