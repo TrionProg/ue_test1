@@ -115,12 +115,11 @@ TSubclassOf<class ATurret> ABuildSpot::get_turret(ETurretType turret_type) {
 }
 
 bool ABuildSpot::spawn_turret(UWorld& world, TSubclassOf<class ATurret>& new_turret, FVector& pos) {
-	auto rotation = FRotator();
+	auto rotation = FRotator(0.0);
 	auto spawn_info = FActorSpawnParameters();
 	spawn_info.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding;
-	//pos.Z += 100;
 
-	auto spawned_turret = world.SpawnActor(new_turret, &pos, NULL, spawn_info);
+	auto spawned_turret = world.SpawnActor(new_turret, &pos, &rotation, spawn_info);
 
 	if (spawned_turret) {
 		turret.set((ATurret*)spawned_turret);
