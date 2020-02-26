@@ -52,42 +52,33 @@ void ABuildSpot::Reset()
 //My methods
 
 bool ABuildSpot::build(ETurretType turret_type) {
-	if (auto existing_turret = turret.match()) {
-		//—троим лишь то, что круче
-		if ((uint8)turret_type > (uint8)existing_turret->get_type()) {
-			existing_turret->Destroy();
-			turret.reset();
-		}else {
-			return false;
-		}
-	}
-
-	//TODO сначала попробуем создать, а лишь затем удал€ем
-	//ј тут трабла, что существующа€ турель будет мешать. Ќадо видимо провер€ть, есть ли кто-то в радиусе
-	//TODO spawn properties
+	UE_LOG(LogTemp, Warning, TEXT("Build ABuildSpot"));
 
 	if (auto world = get_world().match()) {
 		auto pos = GetActorLocation();
 
-		switch (turret_type) {
-		case ETurretType::Machinegun:
-			if (!Turret1) return false;//TODO assert?
+		if (auto existing_turret = turret.match()) {
+			//—троим лишь то, что круче
+			if ((uint8)turret_type > (uint8)existing_turret->get_type()) {
+				// Hides visible components
+				existing_turret->SetActorHiddenInGame(true);
 
-			return spawn_turret(*world, Turret1, pos);
+				// Disables collision components
+				existing_turret->SetActorEnableCollision(false);
 
-			break;
-		case ETurretType::Freeze:
-			if (!Turret2) return false;//TODO assert?
-
-			return spawn_turret(*world, Turret2, pos);
-
-			break;
-		case ETurretType::Pierce:
-			if (!Turret3) return false;//TODO assert?
-
-			return spawn_turret(*world, Turret3, pos);
-
-			break;
+				if (auto turret_to_spawn = get_turret(turret_type)) {
+					if (spawn_turret(*world, turret_to_spawn, pos)) {
+						existing_turret->Destroy();
+						return true;
+					}
+				}
+			}
+		}else {
+			if (auto turret_to_spawn = get_turret(turret_type)) {
+				if (spawn_turret(*world, turret_to_spawn, pos)) {
+					return true;
+				}
+			}
 		}
 	}
 
@@ -98,8 +89,37 @@ OptionPtr<UWorld> ABuildSpot::get_world() {
 	return OptionPtr<UWorld>::new_unchecked(GetWorld());
 }
 
+TSubclassOf<class ATurret> ABuildSpot::get_turret(ETurretType turret_type) {
+	switch (turret_type) {
+	case ETurretType::Machinegun:
+		if (!Turret1) return nullptr;
+
+		return Turret1;
+
+		break;
+	case ETurretType::Freeze:
+		if (!Turret2) return nullptr;
+
+		return Turret2;
+
+		break;
+	case ETurretType::Pierce:
+		if (!Turret3) return nullptr;
+
+		return Turret3;
+
+		break;
+	}
+
+	return nullptr;
+}
+
 bool ABuildSpot::spawn_turret(UWorld& world, TSubclassOf<class ATurret>& new_turret, FVector& pos) {
-	auto spawned_turret = world.SpawnActor(new_turret, &pos);
+	auto rotation = FRotator(0.0);
+	auto spawn_info = FActorSpawnParameters();
+	spawn_info.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding;
+
+	auto spawned_turret = world.SpawnActor(new_turret, &pos, &rotation, spawn_info);
 
 	if (spawned_turret) {
 		turret.set((ATurret*)spawned_turret);
