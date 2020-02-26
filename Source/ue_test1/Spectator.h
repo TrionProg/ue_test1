@@ -47,16 +47,15 @@ protected:
 public:
 	// Sets default values for this pawn's properties
 	ASpectator();
-
+// My variables
 protected:
 	float should_move_left;
 	float should_move_up;
+//My methods and events
+private:
+	void zoom_in();
+	void zoom_out();
 public:	
 	void move_up(float value);
 	void move_right(float value);
-
-	void zoom_in();
-	void zoom_out();
-
-	bool build(ETurretType turret_type);
 };

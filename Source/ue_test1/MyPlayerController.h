@@ -49,6 +49,8 @@ private:
 	OptionPtr<class AMyPlayerState> get_player_state();
 	OptionPtr<class ABasicGameModeBase> get_game_mode(); //TODO only on server
 	OptionPtr<class ABasicGameStateBase> get_game_state();
+
+	bool try_build(ETurretType turret_type);
 private:
 	//Removes the current menu widget and create a new one from the specified class, if provided.
 	UFUNCTION(BlueprintCallable, Category = "UMG")

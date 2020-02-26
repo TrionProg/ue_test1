@@ -10,6 +10,7 @@
 #include "BasicGameModeBase.h"
 #include "BasicGameStateBase.h"
 #include "TurretType.h"
+#include "BuildSpot.h"
 
 //UE events and methods
 
@@ -51,9 +52,7 @@ void AMyPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("Pause", IE_Released, this, &AMyPlayerController::on_key_space_release).bExecuteWhenPaused = true;
 	InputComponent->BindAction("Restart", IE_Released, this, &AMyPlayerController::on_key_r_release).bExecuteWhenPaused = true;
 	InputComponent->BindAction("Quit", IE_Pressed, this, &AMyPlayerController::on_key_q_press).bExecuteWhenPaused = true;
-	//InputComponent->BindAction("TogglePause", EInputEvent::IE_Pressed, this, &MyPlayerController::TogglePause).bExecuteWhenPaused = true;
 
-	//TODO some code:InputComponent->BindAction("TogglePause", EInputEvent::IE_Pressed, this, &MyPlayerController::TogglePause).bExecuteWhenPaused = true;
 }
 
 void AMyPlayerController::PlayerTick(float dt) {
@@ -248,13 +247,39 @@ void AMyPlayerController::build() {
 					return;
 				}
 
-				if (spectator->build(turret_type)) {
+				if (try_build(turret_type)) {
 					player_state->money -= turret_price;
 				}
 			}
 		}
 
 	}
+}
+
+bool AMyPlayerController::try_build(ETurretType turret_type) {
+	FHitResult TraceHitResult;
+	if (GetHitResultUnderCursor(ECC_Visibility, false, TraceHitResult)) {
+		FVector cursor_position = TraceHitResult.Location;
+
+		TArray<AActor*> found_actors;
+
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABuildSpot::StaticClass(), found_actors);
+
+		for (AActor* abstract_actor : found_actors) {
+			ABuildSpot* build_spot = Cast<ABuildSpot>(abstract_actor);
+
+			if (build_spot != nullptr) {
+				auto location = build_spot->GetActorLocation();
+				auto dist = FVector::Dist2D(cursor_position, location);
+
+				if (dist < BUILDSPOT_CLICK_RADUS) {
+					return build_spot->build(turret_type);
+				}
+			}
+		}
+	}
+
+	return false;
 }
 
 void AMyPlayerController::set_money(float money) {

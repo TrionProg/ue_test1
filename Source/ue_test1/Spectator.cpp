@@ -5,7 +5,6 @@
 #include "Runtime/Engine/Classes/Components/InputComponent.h"
 #include "Runtime/Engine/Classes/Engine/World.h"
 #include "GameFramework/PlayerController.h"
-#include "BuildSpot.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "Turret.h"
 #include "TurretType.h"
@@ -20,7 +19,6 @@ const float MAX_ZOOM_DIST = 2000;
 // Sets default values
 ASpectator::ASpectator() : Super()
 {
-	//Super::AActor();
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -75,9 +73,6 @@ void ASpectator::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 	InputComponent->BindAction("ZoomIn", IE_Pressed, this, &ASpectator::zoom_in);//TODO may be and released
 	InputComponent->BindAction("ZoomOut", IE_Pressed, this, &ASpectator::zoom_out);
-
-	//InputComponent->BindAxis("move up", this, &ASpectator::move_up);
-	//InputComponent->BindAxis("move right", this, &ASpectator::move_right);
 }
 
 // Called every frame
@@ -141,31 +136,4 @@ void ASpectator::zoom_out() {
 	}else {
 		spring_arm->TargetArmLength = MAX_ZOOM_DIST;
 	}
-}
-
-bool ASpectator::build(ETurretType turret_type) {
-	if (APlayerController* PC = Cast<APlayerController>(GetController())) {
-		FHitResult TraceHitResult;
-		PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
-		FVector cursor_position = TraceHitResult.Location;
-
-		TArray<AActor*> found_actors;
-
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABuildSpot::StaticClass(), found_actors);
-
-		for (AActor* abstract_actor : found_actors) {
-			ABuildSpot* build_spot = Cast<ABuildSpot>(abstract_actor);
-
-			if (build_spot != nullptr) {
-				auto location = build_spot->GetActorLocation();
-				auto dist = FVector::Dist2D(cursor_position, location);
-
-				if (dist <BUILDSPOT_CLICK_RADUS) {
-					return build_spot->build(turret_type);
-				}
-			}
-		}
-	}
-
-	return false;
 }
